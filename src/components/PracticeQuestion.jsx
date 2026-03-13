@@ -29,14 +29,14 @@ export default function PracticeQuestion({ question, onAnswer }) {
 
   return (
     <div style={{
-      background: 'var(--bg-secondary)',
+      background: 'var(--color-surface)',
       borderRadius: '12px',
       padding: '1.25rem',
-      border: '1px solid var(--border)',
+      border: '1px solid var(--color-border)',
     }}>
       {/* Question header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', gap: '0.5rem' }}>
-        <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', lineHeight: 1.5, flex: 1 }}>
+        <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: 'var(--color-text-primary)', lineHeight: 1.5, flex: 1 }}>
           {question.question}
         </p>
         <span style={{
@@ -51,15 +51,15 @@ export default function PracticeQuestion({ question, onAnswer }) {
       {/* Options */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
         {options.map((opt, idx) => {
-          let bg = 'var(--bg-primary)'
-          let border = 'var(--border)'
-          let color = 'var(--text-primary)'
+          let bg = 'var(--color-bg)'
+          let border = 'var(--color-border)'
+          let color = 'var(--color-text-primary)'
 
           if (revealed) {
             if (idx === correctIndex) { bg = 'rgba(34,197,94,0.12)'; border = '#22c55e'; color = '#22c55e' }
             else if (idx === selected) { bg = 'rgba(239,68,68,0.12)'; border = '#ef4444'; color = '#ef4444' }
           } else if (idx === selected) {
-            bg = 'var(--bg-tertiary)'
+            bg = 'var(--color-surface-raised)'
           }
 
           return (
@@ -80,9 +80,9 @@ export default function PracticeQuestion({ question, onAnswer }) {
 
       {/* Explanation */}
       {revealed && (
-        <div style={{ marginTop: '1rem', padding: '0.85rem', background: 'var(--bg-tertiary)',
-          borderRadius: '8px', fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          <strong style={{ color: 'var(--text-primary)' }}>Explanation: </strong>
+        <div style={{ marginTop: '1rem', padding: '0.85rem', background: 'var(--color-surface-raised)',
+          borderRadius: '8px', fontSize: '0.82rem', color: 'var(--color-text-secondary)', lineHeight: 1.6 }}>
+          <strong style={{ color: 'var(--color-text-primary)' }}>Explanation: </strong>
           {question.explanation}
           {question.trap && (
             <div style={{ marginTop: '0.5rem', color: '#f59e0b' }}>

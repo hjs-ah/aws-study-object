@@ -1,5 +1,4 @@
-// src/pages/Domain.jsx
-// Domain study page — cert-aware, integrates score engine on practice questions.
+// src/pages/Domain.jsx — Domain study page with all tabs restored
 
 import { useParams } from 'react-router-dom'
 import { useState, useEffect } from 'react'
@@ -14,9 +13,7 @@ import ScoreBadge from '../components/ScoreBadge.jsx'
 import { useScore } from '../hooks/useScore.js'
 import { useContent } from '../hooks/useContent.js'
 
-// Lazy-load question JSON for both certs
 const questionLoaders = {
-  // SAA-C03
   vpc: () => import('../data/questions/vpc.json', { assert: { type: 'json' } }),
   iam: () => import('../data/questions/iam.json', { assert: { type: 'json' } }),
   compute: () => import('../data/questions/compute.json', { assert: { type: 'json' } }),
@@ -25,7 +22,6 @@ const questionLoaders = {
   ha: () => import('../data/questions/ha.json', { assert: { type: 'json' } }),
   messaging: () => import('../data/questions/messaging.json', { assert: { type: 'json' } }),
   cost: () => import('../data/questions/cost.json', { assert: { type: 'json' } }),
-  // AIP-C01
   'ai-concepts': () => import('../data/questions/ai-concepts.json', { assert: { type: 'json' } }),
   'gen-ai': () => import('../data/questions/gen-ai.json', { assert: { type: 'json' } }),
   'aws-ai-services': () => import('../data/questions/aws-ai-services.json', { assert: { type: 'json' } }),
@@ -45,15 +41,11 @@ export default function Domain() {
   const { getDomainScore, getDomainCounts, recordAnswer } = useScore(certSlug)
   const { items: notionItems, loading: notionLoading } = useContent(domainSlug, 'question', certSlug)
 
-  // Load seed questions
   useEffect(() => {
     const loader = questionLoaders[domainSlug]
-    if (loader) {
-      loader().then(m => setQuestions(m.default ?? []))
-    }
+    if (loader) loader().then(m => setQuestions(m.default ?? []))
   }, [domainSlug])
 
-  // Merge Notion questions on top of seed questions (Notion takes priority if available)
   const allQuestions = notionItems.length > 0
     ? notionItems.map(item => ({
         id: item.id,
@@ -67,13 +59,11 @@ export default function Domain() {
     : questions
 
   if (!cert || !domain) return (
-    <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Domain not found.</div>
+    <div style={{ padding: '2rem', color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>Domain not found.</div>
   )
 
   const score = getDomainScore(domainSlug)
   const counts = getDomainCounts(domainSlug)
-
-  // AIP doesn't have Architecture Trap/Builder — filter tabs accordingly
   const availableTabs = domain.tabs ?? ['concepts', 'scenarios']
 
   return (
@@ -81,28 +71,21 @@ export default function Domain() {
       <DomainHeader domain={domain} certSlug={certSlug}>
         <ScoreBadge score={score} />
         {counts.total > 0 && (
-          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
             {counts.correct}/{counts.total}
           </span>
         )}
       </DomainHeader>
 
-      <TabBar
-        tabs={availableTabs}
-        active={activeTab}
-        onChange={setActiveTab}
-        color={domain.color}
-      />
+      <TabBar tabs={availableTabs} active={activeTab} onChange={setActiveTab} color={domain.color} />
 
-      <div style={{ flex: 1, overflow: 'auto', padding: '1rem' }}>
-        {activeTab === 'concepts' && (
-          <ConceptMap domain={domain} certSlug={certSlug} />
-        )}
+      <div style={{ flex: 1, overflow: 'auto', padding: '1.25rem' }}>
+        {activeTab === 'concepts' && <ConceptMap domain={domain} certSlug={certSlug} />}
 
         {activeTab === 'scenarios' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {allQuestions.length === 0 ? (
-              <div style={{ color: 'var(--text-muted)', padding: '1rem', textAlign: 'center' }}>
+              <div style={{ color: 'var(--color-text-muted)', padding: '2rem', textAlign: 'center', fontSize: '0.875rem' }}>
                 {notionLoading ? 'Loading questions…' : 'No questions found for this domain yet.'}
               </div>
             ) : (
@@ -117,19 +100,12 @@ export default function Domain() {
           </div>
         )}
 
-        {activeTab === 'architecture-trap' && (
-          <ArchitectureTrap domain={domain} />
-        )}
+        {activeTab === 'architecture-trap' && <ArchitectureTrap domain={domain} />}
 
         {activeTab === 'lab' && (
-          <div style={{ color: 'var(--text-muted)', padding: '1rem', fontSize: '0.875rem' }}>
-            Lab content for {domain.title} — add via Notion (Type = lab).
-          </div>
-        )}
-
-        {activeTab === 'cheat-sheet' && (
-          <div style={{ color: 'var(--text-muted)', padding: '1rem', fontSize: '0.875rem' }}>
-            Cheat sheet for {domain.title} — add via Notion (Type = cheat-sheet).
+          <div style={{ color: 'var(--color-text-muted)', padding: '1.25rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
+            <div style={{ marginBottom: '0.5rem', fontSize: '1rem', fontWeight: 700, color: 'var(--color-text-primary)' }}>🧪 Lab Guide</div>
+            Lab content for <strong>{domain.title}</strong> — add via Notion (Type = lab).
           </div>
         )}
       </div>

@@ -7,10 +7,10 @@ export default function ScoreBadge({ score, total, size = 'sm' }) {
     return total > 0 ? null : (
       <span style={{
         fontSize: size === 'sm' ? '0.65rem' : '0.75rem',
-        color: 'var(--text-muted)',
+        color: 'var(--color-text-muted)',
         padding: '2px 6px',
         borderRadius: '99px',
-        background: 'var(--bg-tertiary)',
+        background: 'var(--color-surface-raised)',
         whiteSpace: 'nowrap',
       }}>no attempts</span>
     )

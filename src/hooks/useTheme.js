@@ -1,5 +1,5 @@
 // src/hooks/useTheme.js
-// Priority: 1) localStorage saved preference  2) OS prefers-color-scheme  3) light (default)
+// Priority: 1) localStorage saved preference  2) light (default)
 import { useState, useEffect } from 'react'
 
 function getInitialTheme() {
@@ -7,8 +7,7 @@ function getInitialTheme() {
     const saved = localStorage.getItem('aws-study-theme')
     if (saved === 'dark' || saved === 'light') return saved
   } catch {}
-  if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark'
-  return 'light'
+  return 'light' // Always default to light
 }
 
 export function useTheme() {

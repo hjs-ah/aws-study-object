@@ -115,20 +115,17 @@ input, textarea { font-family: inherit; }
 .text-danger { color: var(--color-danger); }
 
 /* ── Mobile responsive ───────────────────────────────────────────────────── */
-@media (max-width: 640px) {
-  :root {
-    --sidebar-width: 240px;
+@media (max-width: 767px) {
+  /* Landing page responsive grid */
+  .cert-selector-grid {
+    grid-template-columns: 1fr !important;
   }
-
-  /* Push main content left on mobile — sidebar is a drawer */
-  .app-main {
-    padding-left: 0 !important;
+  .feature-cards-grid {
+    grid-template-columns: 1fr !important;
   }
-
-  /* Give space for hamburger button */
-  .domain-header-wrap,
-  .home-wrap {
-    padding-top: 52px !important;
+  /* Tighten padding on mobile */
+  .home-wrap, .domain-wrap {
+    padding: 1rem !important;
   }
 }
 
@@ -152,4 +149,21 @@ input, textarea { font-family: inherit; }
   --text-muted:    var(--color-text-muted);
   --border:        var(--color-border);
   --accent:        var(--color-accent);
+}
+
+/* ── Base font size restore ───────────────────────────────────────────────── */
+html, body, #root {
+  font-size: 15px; /* Restore from 14px */
+}
+
+/* ── Shorthand aliases (v2 components) ───────────────────────────────────── */
+:root {
+  --bg-primary:     var(--color-bg);
+  --bg-secondary:   var(--color-surface);
+  --bg-tertiary:    var(--color-surface-raised);
+  --text-primary:   var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted:     var(--color-text-muted);
+  --border:         var(--color-border);
+  --accent:         var(--color-accent);
 }
