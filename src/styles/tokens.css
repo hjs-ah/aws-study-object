@@ -113,3 +113,31 @@ input, textarea { font-family: inherit; }
 .text-accent { color: var(--color-accent); }
 .text-success { color: var(--color-success); }
 .text-danger { color: var(--color-danger); }
+
+/* ── Mobile responsive ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root {
+    --sidebar-width: 240px;
+  }
+
+  /* Push main content left on mobile — sidebar is a drawer */
+  .app-main {
+    padding-left: 0 !important;
+  }
+
+  /* Give space for hamburger button */
+  .domain-header-wrap,
+  .home-wrap {
+    padding-top: 52px !important;
+  }
+}
+
+/* ── Interaction pulse — draws attention to clickable elements ───────────── */
+@keyframes interactPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 153, 0, 0.4); }
+  70%  { box-shadow: 0 0 0 6px rgba(255, 153, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 153, 0, 0); }
+}
+.pulse-hint {
+  animation: interactPulse 2s ease-out 1s 2;
+}

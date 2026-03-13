@@ -37,6 +37,8 @@ export function PracticeQuestion({ question, onAnswer }) {
         </div>
         <p style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--color-text-primary)' }}>
           {question.question}
+              </p>
+              <p style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', marginTop: 8 }}>↓ Choose an answer below, then tap Reveal answer
         </p>
       </div>
 

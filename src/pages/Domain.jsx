@@ -36,7 +36,7 @@ export function Domain({ getDomainProgress, recordAnswer }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto' }} className="domain-header-wrap">
         <DomainHeader
           domain={domain}
           progress={progress}
@@ -46,7 +46,7 @@ export function Domain({ getDomainProgress, recordAnswer }) {
 
         <TabBar tabs={domain.tabs} activeTab={activeTab} onTabChange={handleTabChange} />
 
-        <div style={{ padding: '20px 28px' }}>
+        <div style={{ padding: '16px 20px' }}>
 
           {activeTab === 'Concept map' && (
             <ConceptMap domain={domain} />

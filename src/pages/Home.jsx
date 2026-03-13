@@ -7,7 +7,7 @@ export function Home({ getProgress, getOverallStats }) {
   const totalQ = getTotalQuestions()
 
   return (
-    <div style={{ padding: '28px', maxWidth: 900, margin: '0 auto' }}>
+    <div style={{ padding: '20px', maxWidth: 900, margin: '0 auto' }} className="home-wrap">
       {/* Hero */}
       <div style={{ marginBottom: 32 }}>
         <h1 style={{
