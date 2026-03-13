@@ -10,7 +10,7 @@
 
 export const AI_CONFIG = {
   // Toggle this to switch providers: 'anthropic' | 'bedrock'
-  provider: 'anthropic',
+  provider: 'bedrock',
 
   anthropic: {
     model: 'claude-haiku-4-5',
@@ -23,7 +23,7 @@ export const AI_CONFIG = {
 
   // ── V2 Nova config (uncomment when building Bedrock version) ───────────────
   // bedrock: {
-  //   model: 'amazon.nova-pro-v1:0',
+  //   model: 'amazon.nova-lite-v1:0',
   //   region: process.env.AWS_REGION || 'us-east-1',
   //   maxTokens: 600,
   //   // Nova uses different auth: IAM role → access keys → SigV4 signing
