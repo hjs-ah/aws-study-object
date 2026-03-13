@@ -1,0 +1,80 @@
+[
+  {
+    "id": "iam-001",
+    "question": "A developer accidentally committed AWS access keys to a public GitHub repository. What should the solutions architect do FIRST?",
+    "options": [
+      "Rotate the access keys immediately using the IAM console",
+      "Delete the GitHub repository to remove the exposed keys",
+      "Deactivate or delete the exposed access keys immediately, then assess what was accessed using CloudTrail",
+      "Enable MFA on the IAM user account"
+    ],
+    "correct": 2,
+    "explanation": "The immediate priority is deactivating or deleting the exposed keys to stop any ongoing unauthorized access — seconds matter when credentials are public. Rotating alone isn't sufficient because the old keys may still be valid during rotation. After disabling, use CloudTrail to audit what API calls were made with the compromised credentials, then assess blast radius and notify stakeholders.",
+    "trap": "Rotation is not enough as a first step — you must disable/delete immediately. GitHub deletion doesn't help since bots scrape repos in real-time."
+  },
+  {
+    "id": "iam-002",
+    "question": "An application running on EC2 needs to read objects from S3 and write logs to CloudWatch. How should access be configured?",
+    "options": [
+      "Create an IAM user, generate access keys, and store them in the EC2 instance's environment variables",
+      "Create an IAM role with the required permissions and attach it to the EC2 instance as an instance profile",
+      "Hard-code the IAM user's access keys in the application configuration file",
+      "Use the root account credentials passed via EC2 user data"
+    ],
+    "correct": 1,
+    "explanation": "EC2 instance profiles attach an IAM role to an EC2 instance, providing temporary, automatically-rotating credentials via the instance metadata service (IMDS). The application retrieves credentials from http://169.254.169.254/latest/meta-data/iam/ — no keys to manage, rotate, or accidentally expose. This is the foundational AWS security pattern for EC2 applications.",
+    "trap": "Never store credentials in env vars, config files, or user data on EC2. Instance profiles provide automatic, rotated credentials — use them always."
+  },
+  {
+    "id": "iam-003",
+    "question": "A company uses AWS Organizations with multiple accounts. The security team wants to prevent ANY account in the organization from disabling CloudTrail, even if an account administrator tries. What is the MOST effective control?",
+    "options": [
+      "Apply an IAM policy to all IAM users in each account denying cloudtrail:StopLogging",
+      "Create an SCP at the organization root that denies cloudtrail:StopLogging",
+      "Enable CloudTrail log file validation to detect any changes",
+      "Create a CloudWatch alarm that triggers when CloudTrail is stopped"
+    ],
+    "correct": 1,
+    "explanation": "Service Control Policies (SCPs) are the only control that can restrict even account administrators (including root users of member accounts). An SCP at the organization root applies to all accounts and cannot be overridden by any IAM policy within those accounts. IAM policies only restrict IAM principals within an account — they cannot restrict account administrators. SCPs set an absolute ceiling.",
+    "trap": "SCPs can restrict account root users in member accounts — this is unique to SCPs. IAM policies cannot restrict the account's own root user."
+  },
+  {
+    "id": "iam-004",
+    "question": "A company needs to grant a third-party vendor temporary access to specific resources in their AWS account. The vendor has their own AWS account. What is the recommended approach?",
+    "options": [
+      "Create an IAM user for the vendor and share the credentials",
+      "Create an IAM role in your account with a trust policy allowing the vendor's AWS account, then share the role ARN",
+      "Share your root account credentials with the vendor temporarily",
+      "Create a VPN tunnel between the vendor's account and yours"
+    ],
+    "correct": 1,
+    "explanation": "Cross-account access via IAM roles is the AWS-recommended pattern. You create a role in your account with a trust policy that specifies the vendor's account ID as a trusted principal. The vendor then uses STS AssumeRole to get temporary credentials scoped to exactly what the role allows. Credentials expire automatically, no long-term keys are shared, and you can revoke access instantly by modifying the trust policy.",
+    "trap": "Never share long-term IAM user credentials for cross-account access. IAM roles + STS AssumeRole is always the right answer for third-party or cross-account access."
+  },
+  {
+    "id": "iam-005",
+    "question": "An IAM user has an identity-based policy that allows s3:PutObject on a specific bucket. The S3 bucket policy explicitly denies s3:PutObject for all principals. What happens when the user tries to upload a file?",
+    "options": [
+      "The upload succeeds because the identity policy explicitly allows it",
+      "The upload is denied because the bucket policy explicitly denies it",
+      "The result depends on which policy was created first",
+      "The upload succeeds because user policies take precedence over resource policies"
+    ],
+    "correct": 1,
+    "explanation": "AWS policy evaluation logic: explicit Deny always wins, regardless of source. Even if an IAM identity policy grants permission, an explicit Deny in any applicable policy (bucket policy, SCP, permissions boundary, session policy) overrides it. The evaluation order is: 1) Explicit Deny → deny, 2) Explicit Allow → allow, 3) Default → implicit deny. There is no override for an explicit Deny.",
+    "trap": "Explicit Deny ALWAYS wins. No IAM allow can override an explicit Deny. This is the single most important IAM evaluation rule."
+  },
+  {
+    "id": "iam-006",
+    "question": "Which Cognito component should a solutions architect use to allow mobile app users to sign in with their Google account and then access files in S3?",
+    "options": [
+      "Cognito User Pool only — to authenticate with Google and access S3",
+      "Cognito User Pool for authentication, then Cognito Identity Pool to exchange the token for temporary AWS credentials",
+      "Cognito Identity Pool only — both authentication and AWS access",
+      "IAM federation directly with Google without Cognito"
+    ],
+    "correct": 1,
+    "explanation": "This requires both Cognito components working together. The User Pool handles authentication — it federates with Google (social IdP), validates the sign-in, and issues JWT tokens. The Identity Pool then exchanges that JWT token for temporary AWS credentials (via STS) scoped to an IAM role, allowing the app to directly access S3. User Pools authenticate users; Identity Pools authorize AWS resource access.",
+    "trap": "User Pools = who you are (authentication). Identity Pools = what AWS resources you can access (authorization). You need both for the full pattern."
+  }
+]

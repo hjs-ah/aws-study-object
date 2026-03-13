@@ -1,0 +1,67 @@
+[
+  {
+    "id": "compute-001",
+    "question": "A company runs a batch processing workload that can be interrupted and restarted. The job runs for 4-6 hours and cost optimization is the top priority. Which EC2 purchasing option is BEST?",
+    "options": [
+      "On-Demand Instances",
+      "Reserved Instances (1-year term)",
+      "Spot Instances",
+      "Dedicated Hosts"
+    ],
+    "correct": 2,
+    "explanation": "Spot Instances offer up to 90% discount vs On-Demand — the best cost option available. The workload is interruptible and restartable, which is the exact use case Spot is designed for. When AWS reclaims a Spot instance, you get a 2-minute warning via the instance metadata service. For batch jobs that checkpoint their work, Spot interruptions are handled gracefully. Reserved Instances make sense for steady-state workloads, not batch jobs.",
+    "trap": "Spot Instances can be interrupted with only 2 minutes notice. Never use Spot for anything requiring high availability or that cannot tolerate interruption."
+  },
+  {
+    "id": "compute-002",
+    "question": "A Lambda function is processing large files from S3. Some files take up to 20 minutes to process. The function keeps timing out. What should the solutions architect do?",
+    "options": [
+      "Increase the Lambda timeout setting to 25 minutes",
+      "Migrate the processing logic to an EC2 instance or ECS Fargate task",
+      "Use Lambda SnapStart to speed up cold starts",
+      "Split the Lambda function into smaller functions"
+    ],
+    "correct": 1,
+    "explanation": "Lambda has a hard maximum timeout of 15 minutes — this cannot be increased. If processing requires up to 20 minutes, Lambda is simply the wrong tool for this job. EC2 or ECS Fargate can run for unlimited duration. The right architecture: S3 event triggers SQS, ECS Fargate task polls the queue, processes the file, duration unlimited. Lambda SnapStart only reduces cold start time — irrelevant to execution timeout.",
+    "trap": "Lambda maximum timeout = 15 minutes. This is a hard limit, not configurable. Long-running processes need EC2, ECS, or AWS Batch."
+  },
+  {
+    "id": "compute-003",
+    "question": "A high-performance computing (HPC) workload requires extremely low network latency between instances, with nodes needing to communicate at near-wire speed. Which EC2 placement group type should be used?",
+    "options": [
+      "Spread placement group — maximizes availability across hardware",
+      "Partition placement group — separates instances into logical segments",
+      "Cluster placement group — places instances close together in one AZ",
+      "No placement group — default placement is optimal for all workloads"
+    ],
+    "correct": 2,
+    "explanation": "Cluster placement groups pack EC2 instances physically close together within a single AZ, enabling very low network latency and high bandwidth between instances (up to 10 Gbps or more with enhanced networking). This is the standard architecture for HPC, distributed computing, and tightly-coupled workloads. The tradeoff: all instances are in one AZ, so an AZ failure takes down the entire group — acceptable for HPC where performance trumps HA.",
+    "trap": "Cluster = lowest latency, single AZ. Spread = max 7 instances/AZ, maximizes HA. Partition = for large distributed systems like HDFS, Cassandra. Don't confuse them."
+  },
+  {
+    "id": "compute-004",
+    "question": "A company wants to run containerized workloads without managing servers or clusters. They want automatic scaling and pay only for resources used. Which service is BEST?",
+    "options": [
+      "ECS with EC2 launch type",
+      "ECS with Fargate launch type",
+      "Self-managed Kubernetes on EC2",
+      "EC2 Auto Scaling Group"
+    ],
+    "correct": 1,
+    "explanation": "ECS Fargate is serverless containers — you define the task (CPU, memory, container image) and AWS manages the underlying infrastructure entirely. No EC2 instances to provision, patch, or scale. You pay per vCPU and memory consumed per second. ECS with EC2 launch type requires you to manage the EC2 cluster. Self-managed Kubernetes is significant operational overhead. Fargate is the answer when the requirement is 'no server management.'",
+    "trap": "ECS has two launch types: EC2 (you manage the cluster) and Fargate (AWS manages everything). 'No server management' always means Fargate."
+  },
+  {
+    "id": "compute-005",
+    "question": "An application currently runs on EC2. A solutions architect wants to migrate it to a managed service that handles deployment, scaling, and load balancing automatically, while still allowing the developer to control the application code. Which service fits?",
+    "options": [
+      "AWS Lambda — fully managed serverless",
+      "AWS Elastic Beanstalk — managed platform, developer owns code",
+      "Amazon EKS — managed Kubernetes",
+      "AWS Outposts — managed on-premises infrastructure"
+    ],
+    "correct": 1,
+    "explanation": "Elastic Beanstalk is the 'managed platform' service — you upload your application code (Python, Node, Java, etc.) and Beanstalk handles capacity provisioning, load balancing, auto-scaling, and health monitoring. The developer retains full control of application code and can still access the underlying EC2 instances if needed. It's the classic 'lift-and-shift to PaaS' answer. Lambda requires code refactoring; EKS requires container expertise.",
+    "trap": "Elastic Beanstalk manages the PLATFORM, not the application. You still own and control your code — Beanstalk just handles the infrastructure plumbing."
+  }
+]

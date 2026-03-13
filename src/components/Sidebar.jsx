@@ -2,7 +2,68 @@
 import { NavLink } from 'react-router-dom'
 import { DOMAINS } from '../data/domains.js'
 
-export function Sidebar({ getProgress }) {
+function ThemeToggle({ theme, toggleTheme }) {
+  const isDark = theme === 'dark'
+
+  return (
+    <button
+      onClick={toggleTheme}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 7,
+        padding: '6px 10px',
+        background: 'var(--color-surface-raised)',
+        border: '1px solid var(--color-border-emphasis)',
+        borderRadius: 20,
+        cursor: 'pointer',
+        width: '100%',
+        transition: 'background 200ms ease, border-color 200ms ease',
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-accent)' }}
+      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border-emphasis)' }}
+    >
+      {/* Track */}
+      <div style={{
+        width: 28, height: 16,
+        background: isDark ? 'var(--color-accent-dim)' : 'var(--color-accent)',
+        border: `1px solid ${isDark ? 'var(--color-accent-border)' : 'var(--color-accent)'}`,
+        borderRadius: 8,
+        position: 'relative',
+        flexShrink: 0,
+        transition: 'background 250ms ease, border-color 250ms ease',
+      }}>
+        {/* Knob */}
+        <div style={{
+          position: 'absolute',
+          top: 2, left: isDark ? 2 : 12,
+          width: 10, height: 10,
+          borderRadius: '50%',
+          background: isDark ? 'var(--color-accent)' : '#fff',
+          transition: 'left 250ms ease, background 250ms ease',
+        }} />
+      </div>
+
+      {/* Label */}
+      <span style={{
+        fontSize: 11,
+        color: 'var(--color-text-secondary)',
+        fontFamily: 'var(--font-mono)',
+        letterSpacing: '0.02em',
+      }}>
+        {isDark ? 'Dark' : 'Light'}
+      </span>
+
+      {/* Icon */}
+      <span style={{ marginLeft: 'auto', fontSize: 12 }}>
+        {isDark ? '🌙' : '☀️'}
+      </span>
+    </button>
+  )
+}
+
+export function Sidebar({ getProgress, theme, toggleTheme }) {
   return (
     <aside style={{
       width: 'var(--sidebar-width)',
@@ -112,15 +173,21 @@ export function Sidebar({ getProgress }) {
       <div style={{
         padding: '12px 16px',
         borderTop: '1px solid var(--color-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 8,
       }}>
-        <NavLink
-          to="/"
-          style={{ fontSize: 12, color: 'var(--color-text-secondary)', display: 'block', marginBottom: 6 }}
-        >
-          Dashboard
-        </NavLink>
-        <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-          V1 · Claude Haiku
+        <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <NavLink
+            to="/"
+            style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}
+          >
+            Dashboard
+          </NavLink>
+          <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+            V1 · Haiku
+          </div>
         </div>
       </div>
     </aside>

@@ -1,0 +1,41 @@
+[
+  {
+    "id": "db-001",
+    "question": "An RDS MySQL database is experiencing high read traffic causing performance degradation. The application is read-heavy with a 90/10 read-to-write ratio. What is the BEST solution?",
+    "options": [
+      "Upgrade to a larger RDS instance class",
+      "Enable RDS Multi-AZ to distribute read traffic to the standby",
+      "Create RDS Read Replicas and update the application to route reads to them",
+      "Migrate to DynamoDB for better read performance"
+    ],
+    "correct": 2,
+    "explanation": "Read Replicas are specifically designed for read scaling — they use asynchronous replication from the primary and accept read-only connections. You can create up to 5 Read Replicas for RDS MySQL and up to 15 for Aurora. The application must be updated to direct read queries to the replica endpoints and writes to the primary. Multi-AZ standby does NOT accept reads — it exists only for automatic failover.",
+    "trap": "RDS Multi-AZ standby is NOT readable. It's a hot standby for HA failover only. Read Replicas are for read scaling. These are completely different features."
+  },
+  {
+    "id": "db-002",
+    "question": "A gaming application needs a database that can scale to millions of requests per second with single-digit millisecond latency at any scale. Relational data models are not required. Which service is BEST?",
+    "options": [
+      "RDS Aurora — optimized for high-performance relational workloads",
+      "ElastiCache for Redis — in-memory cache layer",
+      "Amazon DynamoDB — managed NoSQL with unlimited scale",
+      "RDS with Read Replicas — for horizontal read scaling"
+    ],
+    "correct": 2,
+    "explanation": "DynamoDB is designed to scale to virtually unlimited throughput and storage with single-digit millisecond performance regardless of scale. It's a fully managed NoSQL key-value and document database. For gaming leaderboards, session data, player profiles — DynamoDB is the standard answer. If sub-millisecond performance is needed, add DAX (DynamoDB Accelerator) as an in-memory cache in front of DynamoDB.",
+    "trap": "Aurora is excellent but it's relational (SQL). The question says relational is NOT required — DynamoDB is always the answer for massive NoSQL scale requirements."
+  },
+  {
+    "id": "db-003",
+    "question": "An e-commerce application uses RDS PostgreSQL. During the annual sale, the database becomes the bottleneck for product catalog lookups — the same 500 products are queried millions of times. What should the architect add?",
+    "options": [
+      "RDS Read Replicas to distribute the catalog lookups",
+      "ElastiCache for Redis as a caching layer in front of RDS",
+      "Upgrade to RDS Aurora PostgreSQL for better performance",
+      "Enable RDS Performance Insights to diagnose and fix the queries"
+    ],
+    "correct": 1,
+    "explanation": "ElastiCache for Redis is the correct caching layer — it stores frequently-accessed data in memory with microsecond latency. The application checks Redis first (cache hit); only on a miss does it query RDS. For a catalog of 500 products queried millions of times, the cache hit rate approaches 100% quickly, dramatically reducing RDS load. This is the classic cache-aside pattern. Read Replicas still hit the database; they scale reads but don't eliminate redundant queries.",
+    "trap": "ElastiCache for Redis supports persistence, replication, and complex data structures. ElastiCache for Memcached is simpler but has no persistence or replication. Redis is almost always the right choice."
+  }
+]

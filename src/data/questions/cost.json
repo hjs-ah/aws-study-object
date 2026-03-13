@@ -1,0 +1,28 @@
+[
+  {
+    "id": "cost-001",
+    "question": "A company runs EC2 instances 24/7 for a production application that will be needed for at least 3 years. Cost optimization is important. Which purchasing option provides the BEST discount?",
+    "options": [
+      "On-Demand Instances — maximum flexibility",
+      "Spot Instances — maximum discount",
+      "1-year Reserved Instances (No Upfront)",
+      "3-year Reserved Instances (All Upfront) or Compute Savings Plans"
+    ],
+    "correct": 3,
+    "explanation": "3-year commitments with All Upfront payment provide the maximum discount — up to 72% off On-Demand for Reserved Instances, or up to 66% with Compute Savings Plans. For workloads confirmed to run 24/7 for 3+ years, the 3-year commitment is almost always worth it. Compute Savings Plans offer similar discounts with more flexibility (apply across any instance family, size, region). Spot cannot be used for 24/7 production workloads due to interruption risk.",
+    "trap": "Savings Plans are more flexible than Reserved Instances (apply across families and regions) with similar discounts. For new commitments, Savings Plans are often preferred over RIs."
+  },
+  {
+    "id": "cost-002",
+    "question": "A solutions architect needs to audit all API calls made in an AWS account over the past 90 days to investigate a security incident. Which service provides this data?",
+    "options": [
+      "Amazon CloudWatch Logs — for application and infrastructure logs",
+      "AWS CloudTrail — for API call history and audit trails",
+      "AWS Config — for configuration change history",
+      "AWS Trusted Advisor — for security recommendations"
+    ],
+    "correct": 1,
+    "explanation": "AWS CloudTrail records every API call made in your account — who called it, from where, at what time, with what parameters, and what the response was. It's the audit log for AWS. CloudTrail logs are stored in S3 and can be queried with Athena. By default, CloudTrail retains event history for 90 days in the console. For longer retention, configure a trail to deliver logs to S3. CloudWatch is for metrics and application logs — not API audit.",
+    "trap": "CloudTrail = API audit logs (who did what). CloudWatch = metrics, alarms, application logs. AWS Config = resource configuration state over time. These are completely different and all tested."
+  }
+]

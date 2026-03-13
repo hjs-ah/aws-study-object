@@ -11,9 +11,13 @@ import { AskBar } from '../components/AskBar.jsx'
 // Lazy-load question data per domain
 const questionModules = {
   vpc: () => import('../data/questions/vpc.json'),
-  // Phase 2: add remaining domains here
-  // iam: () => import('../data/questions/iam.json'),
-  // compute: () => import('../data/questions/compute.json'),
+  iam: () => import('../data/questions/iam.json'),
+  compute: () => import('../data/questions/compute.json'),
+  storage: () => import('../data/questions/storage.json'),
+  databases: () => import('../data/questions/databases.json'),
+  ha: () => import('../data/questions/ha.json'),
+  messaging: () => import('../data/questions/messaging.json'),
+  cost: () => import('../data/questions/cost.json'),
 }
 
 export function Domain({ getDomainProgress, recordAnswer }) {

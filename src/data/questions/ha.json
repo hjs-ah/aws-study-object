@@ -1,0 +1,28 @@
+[
+  {
+    "id": "ha-001",
+    "question": "A company needs a load balancer that supports WebSockets, path-based routing (/api vs /static), and SSL termination. Which load balancer type is correct?",
+    "options": [
+      "Network Load Balancer (NLB) — for high performance",
+      "Application Load Balancer (ALB) — for Layer 7 HTTP/HTTPS",
+      "Gateway Load Balancer (GLB) — for advanced routing",
+      "Classic Load Balancer — for legacy compatibility"
+    ],
+    "correct": 1,
+    "explanation": "ALB operates at Layer 7 (HTTP/HTTPS) and supports path-based routing (/api → one target group, /static → another), host-based routing, WebSocket connections, and SSL/TLS termination. It can route based on URL paths, hostnames, HTTP headers, query parameters, and source IP. NLB operates at Layer 4 (TCP/UDP) — no HTTP awareness, no path-based routing. GLB is for third-party security appliances (firewalls, IDS).",
+    "trap": "ALB = Layer 7 (HTTP features, path routing). NLB = Layer 4 (TCP/UDP, static IPs, ultra-low latency, millions of req/sec). GLB = appliance chaining. Know exactly when each is needed."
+  },
+  {
+    "id": "ha-002",
+    "question": "A company's RTO is 15 minutes and RPO is 5 minutes for a critical workload. Which disaster recovery strategy meets these requirements at the LOWEST cost?",
+    "options": [
+      "Backup and Restore — cheapest but RTO/RPO measured in hours",
+      "Pilot Light — minimal AWS footprint, scale up on disaster",
+      "Warm Standby — reduced capacity always running in DR region",
+      "Active-Active — full capacity in both regions simultaneously"
+    ],
+    "correct": 2,
+    "explanation": "Warm Standby keeps a scaled-down but fully functional copy of the production environment running in the DR region at all times. On disaster, you scale it up to full capacity — typically achievable in minutes. RTO of 15 minutes and RPO of 5 minutes is achievable with Warm Standby using continuous replication. Pilot Light only keeps the data layer warm — it requires starting and configuring application servers (RTO 30-60 min typically). Active-Active meets the targets but at much higher cost.",
+    "trap": "DR tiers by cost and RTO: Backup&Restore (cheapest, hours RTO) → Pilot Light (data warm, compute cold) → Warm Standby (all warm, scaled down) → Active-Active (most expensive, near-zero RTO)."
+  }
+]

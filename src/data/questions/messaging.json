@@ -1,0 +1,28 @@
+[
+  {
+    "id": "msg-001",
+    "question": "An order processing system receives orders via an API. Processing each order takes 2-3 minutes. The API must respond immediately to the customer. Orders must be processed exactly once and in the order they were received. Which architecture is correct?",
+    "options": [
+      "API Gateway → Lambda (synchronous, 2-3 min timeout)",
+      "API Gateway → SNS → Lambda (for fan-out)",
+      "API Gateway → SQS Standard → Lambda consumer",
+      "API Gateway → SQS FIFO → Lambda consumer"
+    ],
+    "correct": 3,
+    "explanation": "SQS FIFO guarantees exactly-once processing and strict ordering (FIFO = First In, First Out). The API writes the order to the queue and immediately returns 200 to the customer — decoupled. The Lambda consumer processes orders sequentially from the queue. SQS Standard provides at-least-once delivery with best-effort ordering (not guaranteed) — wrong for orders that must not duplicate or reorder. SNS doesn't queue — it's pub/sub with no ordering guarantee.",
+    "trap": "SQS Standard = at-least-once + best-effort order. SQS FIFO = exactly-once + strict order, but max 300 TPS (3000 with batching). Use FIFO only when both guarantees are required — it's throughput-limited."
+  },
+  {
+    "id": "msg-002",
+    "question": "A company wants to send a notification to multiple downstream systems (email, SMS, mobile push, and an SQS queue for audit logging) whenever a new user registers. What is the BEST architecture?",
+    "options": [
+      "Lambda function that calls each downstream system sequentially",
+      "SQS queue with multiple consumers polling independently",
+      "SNS topic with subscriptions for email, SMS, mobile push, and SQS",
+      "EventBridge rule with a single Lambda target that fans out manually"
+    ],
+    "correct": 2,
+    "explanation": "SNS fan-out is the canonical pattern for one-to-many messaging. A single SNS topic can have multiple subscriptions: email (via SES), SMS, mobile push (APNS, GCM), Lambda, HTTP endpoints, and SQS queues. When a message is published to the topic, SNS delivers to ALL subscriptions simultaneously and independently. Adding the SQS subscription for audit creates a durable copy of every notification. This is the SNS+SQS fan-out pattern.",
+    "trap": "SNS messages are NOT persisted — if delivery fails and there's no SQS subscription, the message is lost. Always add an SQS subscription when durability matters."
+  }
+]

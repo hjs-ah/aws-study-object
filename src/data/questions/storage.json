@@ -1,0 +1,41 @@
+[
+  {
+    "id": "storage-001",
+    "question": "A company stores large video files in S3. Files are accessed frequently for the first 30 days, occasionally for the next 60 days, and then rarely accessed but must be retained for 7 years. What is the MOST cost-effective S3 configuration?",
+    "options": [
+      "Store all files in S3 Standard for simplicity",
+      "Manually move files between storage classes every 30 days",
+      "Configure S3 Lifecycle rules: Standard → Standard-IA at 30 days → Glacier at 90 days",
+      "Store all files in S3 Glacier from the start"
+    ],
+    "correct": 2,
+    "explanation": "S3 Lifecycle policies automate transitions between storage classes based on age — no manual work required. Standard for the first 30 days (frequent access). Standard-IA (Infrequent Access) from day 30-90 saves ~60% vs Standard with a per-retrieval fee. Glacier (or Glacier Instant Retrieval) after 90 days saves 80%+ for rarely-accessed archival data. The 7-year retention is handled by the rule itself.",
+    "trap": "S3 Standard-IA has a minimum storage duration of 30 days and a per-GB retrieval fee. Don't use Standard-IA for data accessed more than once per month — the retrieval fees eliminate the savings."
+  },
+  {
+    "id": "storage-002",
+    "question": "Multiple EC2 instances across different AZs need to share a common file system with simultaneous read/write access. Which storage solution is correct?",
+    "options": [
+      "EBS gp3 volume mounted to each EC2 instance",
+      "EBS io2 volume with Multi-Attach enabled",
+      "Amazon EFS (Elastic File System)",
+      "S3 with S3 File Gateway"
+    ],
+    "correct": 2,
+    "explanation": "EFS is a fully managed NFS file system that can be mounted simultaneously on thousands of EC2 instances across multiple AZs. It scales automatically, provides shared access, and is the standard answer for shared file storage across EC2. EBS volumes are AZ-locked and can only attach to one instance at a time (with limited exceptions via io2 Multi-Attach, which is cluster-aware, not general-purpose). S3 is object storage, not a POSIX file system.",
+    "trap": "EBS volumes are AZ-locked — you cannot attach an EBS volume to an EC2 instance in a different AZ. EFS is multi-AZ by default."
+  },
+  {
+    "id": "storage-003",
+    "question": "A company needs to migrate 100 TB of data from on-premises to S3 as quickly as possible. Their internet connection is 1 Gbps but the pipe is heavily utilized by production traffic. What is the BEST migration approach?",
+    "options": [
+      "Upload directly to S3 over the internet — 1 Gbps is sufficient",
+      "Use S3 Transfer Acceleration to speed up the internet upload",
+      "Order AWS Snowball Edge devices to physically ship the data",
+      "Set up Direct Connect and then upload"
+    ],
+    "correct": 2,
+    "explanation": "100 TB over a 1 Gbps connection (even fully utilized) takes ~9 days. With a shared production link, real throughput is far less — likely weeks. Snowball Edge devices can hold up to 80 TB each. You load data onto the devices locally (no internet needed), ship them to AWS, and they ingest directly to S3. AWS typically completes ingestion within 1 week of receiving the device. S3 Transfer Acceleration speeds up internet transfers but doesn't solve the bandwidth constraint.",
+    "trap": "When data size × transfer time over available bandwidth > 1 week, Snowball is usually the answer. Calculate: 100TB ÷ 1Gbps × available % = time. Anything over a week → Snowball."
+  }
+]

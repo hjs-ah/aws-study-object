@@ -47,8 +47,39 @@
   --transition: 150ms ease;
 }
 
+/* ── Light theme overrides ───────────────────────────────────────────────── */
+[data-theme="light"] {
+  --color-bg: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f0f1f3;
+  --color-surface-hover: #e8eaee;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-emphasis: rgba(0, 0, 0, 0.15);
+
+  --color-text-primary: #111318;
+  --color-text-secondary: #4a5068;
+  --color-text-muted: #9299ad;
+
+  --color-accent: #d97706;
+  --color-accent-dim: rgba(217, 119, 6, 0.10);
+  --color-accent-border: rgba(217, 119, 6, 0.28);
+
+  --color-success: #0d8a56;
+  --color-success-dim: rgba(13, 138, 86, 0.08);
+  --color-danger: #c0392b;
+  --color-danger-dim: rgba(192, 57, 43, 0.08);
+  --color-warning: #b45309;
+  --color-warning-dim: rgba(180, 83, 9, 0.08);
+  --color-info: #1d4ed8;
+  --color-info-dim: rgba(29, 78, 216, 0.08);
+}
+
 /* ── Reset ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  transition: background 250ms ease, color 250ms ease;
+}
 
 html, body, #root {
   height: 100%;
@@ -58,6 +89,12 @@ html, body, #root {
   font-size: 14px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Smooth all CSS variable transitions on key surfaces */
+aside, main, nav, header, footer,
+[style*="--color"] {
+  transition: background 250ms ease, border-color 250ms ease, color 200ms ease;
 }
 
 a { color: inherit; text-decoration: none; }
