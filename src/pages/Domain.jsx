@@ -2,48 +2,31 @@
 import { useState } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { getDomain } from '../data/domains.js'
+import { useContent } from '../hooks/useContent.js'
 import { DomainHeader } from '../components/DomainHeader.jsx'
 import { TabBar } from '../components/TabBar.jsx'
 import { ConceptMap } from '../components/ConceptMap.jsx'
 import { PracticeQuestion } from '../components/PracticeQuestion.jsx'
 import { AskBar } from '../components/AskBar.jsx'
 
-// Lazy-load question data per domain
-const questionModules = {
-  vpc: () => import('../data/questions/vpc.json'),
-  iam: () => import('../data/questions/iam.json'),
-  compute: () => import('../data/questions/compute.json'),
-  storage: () => import('../data/questions/storage.json'),
-  databases: () => import('../data/questions/databases.json'),
-  ha: () => import('../data/questions/ha.json'),
-  messaging: () => import('../data/questions/messaging.json'),
-  cost: () => import('../data/questions/cost.json'),
-}
-
 export function Domain({ getDomainProgress, recordAnswer }) {
   const { slug } = useParams()
   const domain = getDomain(slug)
-
   const [activeTab, setActiveTab] = useState('Concept map')
-  const [questions, setQuestions] = useState(null)
   const [currentQ, setCurrentQ] = useState(0)
 
-  if (!domain) return <Navigate to="/" replace />
+  // Notion-first content with seed fallback
+  const { questions, loading, source, notionConfigured } = useContent(
+    activeTab === 'Scenarios' ? slug : null
+  )
+
+  if (!domain) return <Navigate to="/app" replace />
 
   const progress = getDomainProgress(slug)
 
-  const loadQuestions = async () => {
-    if (questions !== null) return
-    const loader = questionModules[slug]
-    if (!loader) { setQuestions([]); return }
-    const mod = await loader()
-    setQuestions(mod.default)
-    setCurrentQ(0)
-  }
-
   const handleTabChange = (tab) => {
     setActiveTab(tab)
-    if (tab === 'Scenarios') loadQuestions()
+    setCurrentQ(0)
   }
 
   const handleAnswer = (correct) => {
@@ -51,17 +34,15 @@ export function Domain({ getDomainProgress, recordAnswer }) {
     recordAnswer(slug, questions[currentQ].id, correct)
   }
 
-  const handleNext = () => {
-    if (questions && currentQ < questions.length - 1) {
-      setCurrentQ((n) => n + 1)
-    }
-  }
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      {/* Scrollable content area */}
       <div style={{ flex: 1, overflowY: 'auto' }}>
-        <DomainHeader domain={domain} progress={progress} />
+        <DomainHeader
+          domain={domain}
+          progress={progress}
+          source={source}
+          notionConfigured={notionConfigured}
+        />
 
         <TabBar tabs={domain.tabs} activeTab={activeTab} onTabChange={handleTabChange} />
 
@@ -73,57 +54,84 @@ export function Domain({ getDomainProgress, recordAnswer }) {
 
           {activeTab === 'Scenarios' && (
             <div>
-              {questions === null && (
-                <div style={{ color: 'var(--color-text-muted)', fontSize: 13 }}>Loading questions…</div>
-              )}
-              {questions?.length === 0 && (
+              {loading && (
                 <div style={{
-                  padding: '24px', textAlign: 'center',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  padding: 20, color: 'var(--color-text-muted)', fontSize: 13,
+                }}>
+                  <div style={{
+                    width: 14, height: 14,
+                    border: '2px solid var(--color-border-emphasis)',
+                    borderTopColor: 'var(--color-accent)',
+                    borderRadius: '50%',
+                    animation: 'spin 0.7s linear infinite',
+                  }} />
+                  Loading questions…
+                </div>
+              )}
+
+              {!loading && questions?.length === 0 && (
+                <div style={{
+                  padding: 24, textAlign: 'center',
                   background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)',
                   border: '1px solid var(--color-border)',
                   color: 'var(--color-text-muted)', fontSize: 13,
                 }}>
-                  Questions for {domain.title} coming in Phase 2
+                  No questions found for {domain.title} yet.
+                  <br />
+                  <span style={{ fontSize: 11, marginTop: 6, display: 'block', fontFamily: 'var(--font-mono)' }}>
+                    Add rows to your Notion database with Domain = {slug} and Type = question
+                  </span>
                 </div>
               )}
-              {questions?.length > 0 && (
+
+              {!loading && questions?.length > 0 && (
                 <div>
+                  {/* Progress dots + counter */}
                   <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     marginBottom: 14,
                   }}>
-                    <span style={{ fontSize: 12, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
+                    <span style={{
+                      fontSize: 12, color: 'var(--color-text-muted)',
+                      fontFamily: 'var(--font-mono)',
+                    }}>
                       {currentQ + 1} / {questions.length}
+                      {source && (
+                        <span style={{ marginLeft: 8, opacity: 0.6 }}>
+                          · {source === 'notion' ? 'from Notion' : 'seed data'}
+                        </span>
+                      )}
                     </span>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      {questions.map((_, i) => (
+                    <div style={{ display: 'flex', gap: 5 }}>
+                      {questions.map((q, i) => (
                         <button
                           key={i}
                           onClick={() => setCurrentQ(i)}
                           style={{
-                            width: 7, height: 7,
-                            borderRadius: '50%',
-                            border: 'none',
+                            width: 7, height: 7, borderRadius: '50%', border: 'none',
                             background: i === currentQ
                               ? 'var(--color-accent)'
-                              : progress.answeredQuestions?.[questions[i].id]
+                              : progress.answeredQuestions?.[q.id]
                                 ? 'var(--color-success)'
                                 : 'var(--color-border-emphasis)',
                             cursor: 'pointer',
-                            transition: 'var(--transition)',
+                            transition: 'background 200ms ease',
                           }}
                         />
                       ))}
                     </div>
                   </div>
+
                   <PracticeQuestion
                     key={questions[currentQ].id}
                     question={questions[currentQ]}
                     onAnswer={handleAnswer}
                   />
+
                   <div style={{ marginTop: 12, textAlign: 'right' }}>
                     <button
-                      onClick={handleNext}
+                      onClick={() => setCurrentQ((n) => Math.min(n + 1, questions.length - 1))}
                       disabled={currentQ >= questions.length - 1}
                       style={{
                         padding: '8px 16px',
@@ -132,6 +140,7 @@ export function Domain({ getDomainProgress, recordAnswer }) {
                         borderRadius: 'var(--radius-sm)',
                         color: 'var(--color-text-secondary)',
                         fontSize: 13, cursor: 'pointer',
+                        opacity: currentQ >= questions.length - 1 ? 0.4 : 1,
                       }}
                     >
                       Skip →
@@ -143,32 +152,70 @@ export function Domain({ getDomainProgress, recordAnswer }) {
           )}
 
           {activeTab === 'Lab guide' && (
-            <div style={{
-              padding: '24px', textAlign: 'center',
-              background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-text-muted)', fontSize: 13,
-            }}>
-              Hands-on lab guides — Phase 3 (Notion CMS)
-            </div>
+            <LabGuide slug={slug} />
           )}
 
           {activeTab === 'Cheat sheet' && (
-            <div style={{
-              padding: '24px', textAlign: 'center',
-              background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)',
-              border: '1px solid var(--color-border)',
-              color: 'var(--color-text-muted)', fontSize: 13,
-            }}>
-              Printable cheat sheets — Phase 3 (Notion CMS)
-            </div>
+            <CheatSheet slug={slug} />
           )}
 
         </div>
       </div>
 
-      {/* Ask bar — pinned to bottom */}
       <AskBar domainSlug={slug} domainTitle={domain.title} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  )
+}
+
+// ── Lab guide — fetches Notion rows with type=lab ─────────────────────────
+function LabGuide({ slug }) {
+  const { questions: items, loading, source } = useContent(slug, 'lab')
+  return <NotionContentPane items={items} loading={loading} source={source} slug={slug} type="lab" emptyMsg="Lab guides coming soon — add rows with Type = lab in Notion." />
+}
+
+// ── Cheat sheet — fetches Notion rows with type=cheat-sheet ──────────────
+function CheatSheet({ slug }) {
+  const { questions: items, loading, source } = useContent(slug, 'cheat-sheet')
+  return <NotionContentPane items={items} loading={loading} source={source} slug={slug} type="cheat-sheet" emptyMsg="Cheat sheets coming soon — add rows with Type = cheat-sheet in Notion." />
+}
+
+function NotionContentPane({ items, loading, source, emptyMsg }) {
+  if (loading) return (
+    <div style={{ color: 'var(--color-text-muted)', fontSize: 13, padding: 20 }}>Loading…</div>
+  )
+  if (!items?.length) return (
+    <div style={{
+      padding: 24, textAlign: 'center',
+      background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)',
+      border: '1px solid var(--color-border)',
+      color: 'var(--color-text-muted)', fontSize: 13,
+    }}>
+      {emptyMsg}
+    </div>
+  )
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {source && (
+        <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>
+          Source: {source}
+        </div>
+      )}
+      {items.map((item) => (
+        <div key={item.id} style={{
+          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+          borderRadius: 'var(--radius-md)', padding: '14px 16px',
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 8 }}>
+            {item.question}
+          </div>
+          {item.body && (
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>
+              {item.body}
+            </p>
+          )}
+        </div>
+      ))}
     </div>
   )
 }
