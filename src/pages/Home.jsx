@@ -59,7 +59,7 @@ export function Home({ getProgress, getOverallStats }) {
             return (
               <Link
                 key={domain.slug}
-                to={`/domain/${domain.slug}`}
+                to={`/app/domain/${domain.slug}`}
                 style={{
                   display: 'block',
                   background: 'var(--color-surface)',

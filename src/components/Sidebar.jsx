@@ -116,7 +116,7 @@ export function Sidebar({ getProgress, theme, toggleTheme }) {
           return (
             <NavLink
               key={domain.slug}
-              to={`/domain/${domain.slug}`}
+              to={`/app/domain/${domain.slug}`}
               style={({ isActive }) => ({
                 display: 'block',
                 padding: '7px 8px',
@@ -180,7 +180,7 @@ export function Sidebar({ getProgress, theme, toggleTheme }) {
         <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <NavLink
-            to="/"
+            to="/app"
             style={{ fontSize: 12, color: 'var(--color-text-secondary)' }}
           >
             Dashboard
