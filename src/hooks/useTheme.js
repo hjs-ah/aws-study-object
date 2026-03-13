@@ -1,20 +1,14 @@
 // src/hooks/useTheme.js
-// Manages dark/light theme.
-// Priority: 1) localStorage saved preference  2) OS prefers-color-scheme  3) dark
-// Applies data-theme attribute to <html> — CSS variable swap does the rest.
-
+// Priority: 1) localStorage saved preference  2) OS prefers-color-scheme  3) light (default)
 import { useState, useEffect } from 'react'
-
-const STORAGE_KEY = 'aws-study-theme'
 
 function getInitialTheme() {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved === 'light' || saved === 'dark') return saved
-  } catch { /* localStorage blocked */ }
-
-  if (window.matchMedia?.('(prefers-color-scheme: light)').matches) return 'light'
-  return 'dark'
+    const saved = localStorage.getItem('aws-study-theme')
+    if (saved === 'dark' || saved === 'light') return saved
+  } catch {}
+  if (window.matchMedia?.('(prefers-color-scheme: dark)').matches) return 'dark'
+  return 'light'
 }
 
 export function useTheme() {
@@ -22,10 +16,9 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    try { localStorage.setItem(STORAGE_KEY, theme) } catch { /* ignore */ }
+    try { localStorage.setItem('aws-study-theme', theme) } catch {}
   }, [theme])
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
-
   return { theme, toggleTheme }
 }

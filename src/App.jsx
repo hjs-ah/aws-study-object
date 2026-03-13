@@ -4,6 +4,7 @@ import { Sidebar } from './components/Sidebar.jsx'
 import { Landing } from './pages/Landing.jsx'
 import { Home } from './pages/Home.jsx'
 import { Domain } from './pages/Domain.jsx'
+import { HowToUse } from './pages/HowToUse.jsx'
 import { useProgress } from './hooks/useProgress.js'
 import { useTheme } from './hooks/useTheme.js'
 import './styles/tokens.css'
@@ -15,6 +16,7 @@ function AppShell({ getDomainProgress, recordAnswer, getOverallStats, theme, tog
       <main style={{ flex: 1, overflowY: 'auto', background: 'var(--color-bg)', minWidth: 0 }}>
         <Routes>
           <Route path="/" element={<Home getProgress={getDomainProgress} getOverallStats={getOverallStats} />} />
+          <Route path="/how-to-use" element={<HowToUse />} />
           <Route path="/domain/:slug" element={<Domain getDomainProgress={getDomainProgress} recordAnswer={recordAnswer} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -31,18 +33,15 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing theme={theme} toggleTheme={toggleTheme} />} />
-        <Route
-          path="/app/*"
-          element={
-            <AppShell
-              getDomainProgress={getDomainProgress}
-              recordAnswer={recordAnswer}
-              getOverallStats={getOverallStats}
-              theme={theme}
-              toggleTheme={toggleTheme}
-            />
-          }
-        />
+        <Route path="/app/*" element={
+          <AppShell
+            getDomainProgress={getDomainProgress}
+            recordAnswer={recordAnswer}
+            getOverallStats={getOverallStats}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+        } />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

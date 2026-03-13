@@ -2,14 +2,19 @@
 import { VPCDiagram } from './diagrams/VPCDiagram.jsx'
 import { IAMDiagram } from './diagrams/IAMDiagram.jsx'
 import { GenericDiagram } from './diagrams/GenericDiagram.jsx'
+import { GlossaryTerms } from './GlossaryTerms.jsx'
 
 const DIAGRAM_MAP = {
   vpc: VPCDiagram,
   iam: IAMDiagram,
-  // Phase 3: ComputeDiagram, StorageDiagram, DatabasesDiagram, HADiagram, MessagingDiagram, CostDiagram
 }
 
 export function ConceptMap({ domain }) {
   const DiagramComponent = DIAGRAM_MAP[domain.slug] ?? GenericDiagram
-  return <DiagramComponent domain={domain} />
+  return (
+    <div>
+      <DiagramComponent domain={domain} />
+      <GlossaryTerms domainSlug={domain.slug} />
+    </div>
+  )
 }

@@ -154,6 +154,10 @@ export function Sidebar({ getProgress, theme, toggleTheme }) {
       <div style={{ padding: '10px 12px', borderTop: '1px solid var(--color-border)', display: 'flex', flexDirection: 'column', gap: 8 }}>
         <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <NavLink to="/app/how-to-use" onClick={() => setMobileOpen(false)}
+            style={{ fontSize: 11, color: "var(--color-accent)", marginBottom: 4, display: "block" }}>
+              📖 How to Use
+            </NavLink>
           <NavLink to="/app" onClick={() => setMobileOpen(false)}
             style={{ fontSize: 11, color: 'var(--color-text-secondary)' }}>
             ← Dashboard
