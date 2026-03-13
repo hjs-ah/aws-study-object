@@ -34,8 +34,8 @@ export default async function handler(req, res) {
       return await handleAnthropic({ question, systemPrompt, res })
     }
   } catch (err) {
-    console.error('AI API error:', err)
-    return res.status(500).json({ error: 'AI request failed. Please try again.' })
+    console.error('AI API error:', err?.message ?? err)
+    return res.status(500).json({ error: 'AI request failed. Please try again.', detail: process.env.NODE_ENV !== 'production' ? String(err) : undefined })
   }
 }
 
