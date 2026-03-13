@@ -296,3 +296,5 @@ function GlossaryMini() {
     </div>
   )
 }
+
+export default HowToUse

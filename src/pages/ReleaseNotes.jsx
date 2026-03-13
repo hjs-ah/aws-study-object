@@ -257,3 +257,5 @@ export function ReleaseNotes() {
     </div>
   )
 }
+
+export default ReleaseNotes

@@ -2,9 +2,9 @@
 import { useState } from 'react'
 import { useAsk } from '../hooks/useAsk.js'
 
-export function AskBar({ domainSlug, domainTitle }) {
+export function AskBar({ domainSlug, certSlug, domainTitle }) {
   const [input, setInput] = useState('')
-  const { ask, answer, loading, error, clear } = useAsk(domainSlug)
+  const { ask, answer, loading, error, clear } = useAsk(domainSlug, certSlug)
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -159,3 +159,5 @@ export function AskBar({ domainSlug, domainTitle }) {
     </div>
   )
 }
+
+export default AskBar

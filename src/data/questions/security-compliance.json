@@ -1,0 +1,29 @@
+[
+  {
+    "id": "sec001",
+    "question": "When using Amazon Bedrock, who is responsible for the security of data sent in API requests?",
+    "options": ["A. AWS is fully responsible", "B. The FM provider (e.g., Anthropic)", "C. The customer, under the shared responsibility model", "D. Security is automatic with no customer action needed"],
+    "answer": 2,
+    "explanation": "Under AWS's Shared Responsibility Model, AWS secures the infrastructure (hardware, network, hypervisor), while the customer is responsible for data security — encrypting sensitive data, controlling access via IAM, and managing what data enters the model.",
+    "difficulty": "medium",
+    "trap": "The shared responsibility model applies to ALL AWS services including AI/ML. Customers always own their data security."
+  },
+  {
+    "id": "sec002",
+    "question": "Which AWS service provides audit logs showing who called Amazon Bedrock APIs and when?",
+    "options": ["A. Amazon CloudWatch Metrics", "B. AWS CloudTrail", "C. Amazon GuardDuty", "D. AWS Config"],
+    "answer": 1,
+    "explanation": "AWS CloudTrail records all API calls across AWS services including Bedrock — capturing who made the call, from where, and when. Essential for compliance audits and security investigations.",
+    "difficulty": "easy",
+    "trap": "CloudWatch monitors performance metrics. CloudTrail logs API activity for governance and compliance."
+  },
+  {
+    "id": "sec003",
+    "question": "A company must ensure that prompts sent to Amazon Bedrock do not contain PII (personally identifiable information). Which feature handles this automatically?",
+    "options": ["A. Bedrock Fine-Tuning", "B. Bedrock Guardrails with PII redaction", "C. Amazon Macie", "D. IAM Policies"],
+    "answer": 1,
+    "explanation": "Bedrock Guardrails includes a PII detection and redaction feature that automatically identifies and masks sensitive personal data (SSNs, credit card numbers, emails, etc.) in both prompts and responses.",
+    "difficulty": "medium",
+    "trap": "Macie scans S3 for PII in stored data. Guardrails handles PII at the model API layer in real time."
+  }
+]

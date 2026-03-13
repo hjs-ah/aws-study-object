@@ -1,126 +1,112 @@
 // src/pages/Home.jsx
-import { Link } from 'react-router-dom'
-import { DOMAINS, getTotalQuestions } from '../data/domains.js'
+// Cert home — shows domain grid + score dashboard for a given certification.
 
-export function Home({ getProgress, getOverallStats }) {
-  const stats = getOverallStats()
-  const totalQ = getTotalQuestions()
+import { useParams, useNavigate } from 'react-router-dom'
+import { getCert } from '../data/certifications.js'
+import { useScore } from '../hooks/useScore.js'
+import ScoreBadge from '../components/ScoreBadge.jsx'
+
+export default function Home() {
+  const { certSlug } = useParams()
+  const navigate = useNavigate()
+  const cert = getCert(certSlug)
+  const { getDomainScore, getDomainCounts, getOverallScore, isExamReady } = useScore(certSlug)
+
+  if (!cert) {
+    return (
+      <div style={{ padding: '2rem', color: 'var(--text-primary)' }}>
+        Certification not found. <button onClick={() => navigate('/')} style={{ background: 'none', border: 'none', color: cert?.color, cursor: 'pointer', textDecoration: 'underline' }}>Go back</button>
+      </div>
+    )
+  }
+
+  const overall = getOverallScore(cert.domains)
+  const examReady = isExamReady(cert.domains)
 
   return (
-    <div style={{ padding: '20px', maxWidth: 900, margin: '0 auto' }} className="home-wrap">
-      {/* Hero */}
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{
-          fontSize: 28, fontWeight: 600, letterSpacing: '-0.02em',
-          color: 'var(--color-text-primary)', marginBottom: 6,
-        }}>
-          AWS Solutions Architect
-        </h1>
-        <p style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>
-          SAA-C03 · 8 domains · {totalQ} practice questions
-        </p>
-      </div>
+    <div style={{ padding: '1.5rem', maxWidth: '800px', margin: '0 auto' }}>
 
-      {/* Overall stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 28 }}>
-        {[
-          { label: 'Domains attempted', value: `${stats.attempted}/8` },
-          { label: 'Average score', value: stats.avgScore !== null ? `${stats.avgScore}%` : '—' },
-          { label: 'Total answers', value: stats.totalAttempts },
-        ].map(({ label, value }) => (
-          <div key={label} style={{
-            background: 'var(--color-surface)',
-            border: '1px solid var(--color-border)',
-            borderRadius: 'var(--radius-lg)',
-            padding: '16px 20px',
-          }}>
-            <div style={{ fontSize: 11, color: 'var(--color-text-muted)', marginBottom: 6 }}>{label}</div>
-            <div style={{
-              fontSize: 26, fontWeight: 600, fontFamily: 'var(--font-mono)',
-              color: 'var(--color-text-primary)',
-            }}>
-              {value}
+      {/* Cert header */}
+      <div style={{ marginBottom: '2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+          <span style={{ fontSize: '1.75rem' }}>{cert.icon}</span>
+          <div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              {cert.examCode} · {cert.subtitle}
             </div>
+            <h1 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+              {cert.title}
+            </h1>
           </div>
-        ))}
+          {overall !== null && (
+            <div style={{ marginLeft: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+              <ScoreBadge score={overall} size="lg" />
+              {examReady && <span style={{ fontSize: '0.7rem', color: '#22c55e', marginTop: '2px' }}>Exam Ready ✓</span>}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Domain grid */}
-      <div style={{ marginBottom: 12 }}>
-        <h2 style={{ fontSize: 13, color: 'var(--color-text-muted)', marginBottom: 12, fontWeight: 400 }}>
-          All domains
-        </h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
-          {DOMAINS.map((domain) => {
-            const prog = getProgress(domain.slug)
-            const score = prog.score
-            const attempted = Object.keys(prog.answeredQuestions ?? {}).length
-
-            return (
-              <Link
-                key={domain.slug}
-                to={`/app/domain/${domain.slug}`}
-                style={{
-                  display: 'block',
-                  background: 'var(--color-surface)',
-                  border: '1px solid var(--color-border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '16px 18px',
-                  transition: 'var(--transition)',
-                  textDecoration: 'none',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-border-emphasis)'
-                  e.currentTarget.style.background = 'var(--color-surface-raised)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = 'var(--color-border)'
-                  e.currentTarget.style.background = 'var(--color-surface)'
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 2 }}>
-                      {domain.title}
-                    </div>
-                    <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-                      {domain.questionCount} questions
-                    </div>
-                  </div>
-                  <span style={{
-                    fontSize: 10, fontFamily: 'var(--font-mono)',
-                    padding: '2px 7px',
-                    background: 'var(--color-accent-dim)',
-                    border: '1px solid var(--color-accent-border)',
-                    borderRadius: 20,
-                    color: 'var(--color-accent)',
-                  }}>
-                    {domain.weight}%
-                  </span>
-                </div>
-
-                {/* Progress bar */}
-                <div style={{
-                  height: 3, background: 'var(--color-border)',
-                  borderRadius: 2, overflow: 'hidden', marginBottom: 6,
-                }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '1rem' }}>
+        {cert.domains.map((domain) => {
+          const score = getDomainScore(domain.slug)
+          const counts = getDomainCounts(domain.slug)
+          return (
+            <div
+              key={domain.slug}
+              onClick={() => navigate(`/app/${certSlug}/domain/${domain.slug}`)}
+              style={{
+                background: 'var(--bg-secondary)',
+                borderRadius: '12px',
+                padding: '1.25rem',
+                cursor: 'pointer',
+                border: '1px solid var(--border)',
+                transition: 'all 0.15s',
+                borderLeft: `3px solid ${domain.color}`,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-primary)' }}>{domain.title}</span>
+                <ScoreBadge score={score} />
+              </div>
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
+                {domain.weight}% of exam · {domain.questionCount} questions
+              </div>
+              {counts.total > 0 && (
+                <div style={{ height: '3px', background: 'var(--bg-tertiary)', borderRadius: '99px', overflow: 'hidden' }}>
                   <div style={{
-                    width: score !== null ? `${score}%` : '0%',
-                    height: '100%',
-                    background: score >= 80 ? 'var(--color-success)' : score >= 60 ? 'var(--color-warning)' : score !== null ? 'var(--color-danger)' : 'transparent',
-                    borderRadius: 2,
-                    transition: 'width 600ms ease',
+                    height: '100%', borderRadius: '99px', transition: 'width 0.4s ease',
+                    width: `${score ?? 0}%`,
+                    background: score >= 80 ? '#22c55e' : score >= 60 ? '#f59e0b' : '#ef4444',
                   }} />
                 </div>
-
-                <div style={{ fontSize: 11, color: 'var(--color-text-muted)' }}>
-                  {score !== null ? `${score}% · ${attempted} answered` : 'Not started'}
-                </div>
-              </Link>
-            )
-          })}
-        </div>
+              )}
+              <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+                {counts.total === 0 ? 'Not started' : `${counts.correct}/${counts.total} correct`}
+              </div>
+            </div>
+          )
+        })}
       </div>
+
+      {/* Score dashboard link */}
+      <button
+        onClick={() => navigate(`/app/${certSlug}/scores`)}
+        style={{
+          marginTop: '1.5rem', width: '100%', padding: '0.85rem',
+          background: 'var(--bg-secondary)', border: '1px solid var(--border)',
+          borderRadius: '10px', cursor: 'pointer', fontSize: '0.875rem',
+          color: 'var(--text-primary)', fontWeight: 600,
+          transition: 'background 0.15s',
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
+        onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-secondary)'}
+      >
+        📊 View Full Score Dashboard →
+      </button>
     </div>
   )
 }

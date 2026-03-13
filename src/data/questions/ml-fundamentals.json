@@ -1,0 +1,29 @@
+[
+  {
+    "id": "ml001",
+    "question": "What is the purpose of a training/validation/test split in ML?",
+    "options": ["A. To reduce training time", "B. Train on training set, tune hyperparameters on validation set, evaluate final performance on test set", "C. To create three separate models", "D. Validation and test sets are the same thing"],
+    "answer": 1,
+    "explanation": "The three-way split prevents data leakage: training data trains the model, validation data tunes hyperparameters and catches overfitting, and the test set gives an unbiased final evaluation the model has never seen.",
+    "difficulty": "medium",
+    "trap": "Using the test set for tuning contaminates it — your final evaluation becomes optimistic. Keep test data locked away until the very end."
+  },
+  {
+    "id": "ml002",
+    "question": "What is a hyperparameter in machine learning?",
+    "options": ["A. A parameter learned from training data", "B. A configuration setting set before training that controls the learning process", "C. The output of the model", "D. A feature in the training dataset"],
+    "answer": 1,
+    "explanation": "Hyperparameters (learning rate, batch size, number of layers, etc.) are set before training begins and control HOW the model learns. Model parameters (weights) are learned FROM the data during training.",
+    "difficulty": "medium",
+    "trap": "Parameters = learned by model. Hyperparameters = set by you. The exam tests this distinction."
+  },
+  {
+    "id": "ml003",
+    "question": "Which AWS service automates hyperparameter tuning for SageMaker models?",
+    "options": ["A. SageMaker Autopilot", "B. SageMaker Hyperparameter Tuning (Automatic Model Tuning)", "C. SageMaker Pipelines", "D. SageMaker Clarify"],
+    "answer": 1,
+    "explanation": "SageMaker Automatic Model Tuning (Hyperparameter Tuning) runs multiple training jobs with different hyperparameter combinations and finds the optimal configuration using Bayesian optimization.",
+    "difficulty": "medium",
+    "trap": "Autopilot automates the entire ML workflow including algorithm selection. Hyperparameter Tuning specifically optimizes a chosen algorithm's settings."
+  }
+]

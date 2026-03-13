@@ -1,0 +1,56 @@
+[
+  {
+    "id": "aic001",
+    "question": "What is the primary difference between supervised and unsupervised machine learning?",
+    "options": ["A. Supervised learning uses more data", "B. Supervised learning trains on labeled data; unsupervised finds patterns in unlabeled data", "C. Unsupervised learning is faster", "D. Supervised learning only works with images"],
+    "answer": 1,
+    "explanation": "Supervised learning uses labeled training data (input-output pairs) to learn a mapping function. Unsupervised learning discovers hidden patterns or structures in data without predefined labels.",
+    "difficulty": "easy",
+    "trap": "Don't confuse 'supervised' with 'more data' — label quality matters more than quantity."
+  },
+  {
+    "id": "aic002",
+    "question": "Which metric best measures a binary classification model's performance on imbalanced datasets?",
+    "options": ["A. Accuracy", "B. Mean Squared Error", "C. F1 Score", "D. R-squared"],
+    "answer": 2,
+    "explanation": "F1 Score balances precision and recall, making it ideal for imbalanced datasets where one class vastly outnumbers the other. Accuracy is misleading when 95% of samples belong to one class.",
+    "difficulty": "medium",
+    "trap": "Accuracy looks great on imbalanced data — a model predicting the majority class always gets high accuracy but is useless."
+  },
+  {
+    "id": "aic003",
+    "question": "What is overfitting in machine learning?",
+    "options": ["A. Model performs well on training data but poorly on new data", "B. Model trains too slowly", "C. Model uses too much memory", "D. Model performs poorly on both training and test data"],
+    "answer": 0,
+    "explanation": "Overfitting occurs when a model learns the training data too well — including noise — and fails to generalize to unseen data. High training accuracy + low test accuracy = overfitting.",
+    "difficulty": "easy",
+    "trap": "Option D describes underfitting, not overfitting. Know the difference."
+  },
+  {
+    "id": "aic004",
+    "question": "A company wants to predict customer churn. Which ML problem type is this?",
+    "options": ["A. Regression", "B. Clustering", "C. Binary Classification", "D. Dimensionality Reduction"],
+    "answer": 2,
+    "explanation": "Predicting whether a customer will churn (yes/no) is binary classification — two discrete output classes. Regression predicts continuous values; clustering groups similar items without labels.",
+    "difficulty": "easy",
+    "trap": "If the question asked to predict HOW MUCH revenue would be lost, that would be regression."
+  },
+  {
+    "id": "aic005",
+    "question": "What does the term 'inference' mean in the context of ML models?",
+    "options": ["A. Training the model on new data", "B. Using a trained model to make predictions on new inputs", "C. Evaluating model accuracy", "D. Cleaning training data"],
+    "answer": 1,
+    "explanation": "Inference is the process of running a trained model to generate predictions on new, unseen data. Training happens before inference — inference is the 'production' phase.",
+    "difficulty": "easy",
+    "trap": "Inference ≠ training. The exam tests whether you know where compute costs accumulate (inference at scale is expensive)."
+  },
+  {
+    "id": "aic006",
+    "question": "Which technique reduces overfitting by randomly dropping neurons during training?",
+    "options": ["A. Batch Normalization", "B. Dropout", "C. Transfer Learning", "D. Gradient Clipping"],
+    "answer": 1,
+    "explanation": "Dropout randomly deactivates a percentage of neurons during each training pass, forcing the network to learn redundant representations and reducing reliance on specific neurons — preventing overfitting.",
+    "difficulty": "medium",
+    "trap": "Batch normalization normalizes layer inputs for training stability — it's not a regularization technique in the same sense."
+  }
+]

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "aws001",
+    "question": "Which AWS service performs natural language processing tasks like sentiment analysis and entity recognition?",
+    "options": ["A. Amazon Rekognition", "B. Amazon Transcribe", "C. Amazon Comprehend", "D. Amazon Polly"],
+    "answer": 2,
+    "explanation": "Amazon Comprehend is the NLP service — it analyzes text to extract entities, key phrases, sentiment, language, and topics. Think: Comprehend = understand text.",
+    "difficulty": "easy",
+    "trap": "Transcribe = speech to text. Polly = text to speech. Rekognition = image/video analysis. Comprehend = text analysis."
+  },
+  {
+    "id": "aws002",
+    "question": "A company wants to add a conversational chatbot to their app. Which AWS service is purpose-built for this?",
+    "options": ["A. Amazon Comprehend", "B. Amazon Lex", "C. Amazon Kendra", "D. Amazon Textract"],
+    "answer": 1,
+    "explanation": "Amazon Lex provides conversational AI — the same technology behind Alexa. It handles intent recognition, slot filling, and dialogue management for building chatbots and voice interfaces.",
+    "difficulty": "easy",
+    "trap": "Kendra is an intelligent search service, not a chatbot builder. Don't confuse conversational AI with enterprise search."
+  },
+  {
+    "id": "aws003",
+    "question": "Which service would you use to extract structured data from scanned invoices and forms?",
+    "options": ["A. Amazon Rekognition", "B. Amazon Textract", "C. Amazon Comprehend", "D. Amazon Translate"],
+    "answer": 1,
+    "explanation": "Amazon Textract goes beyond OCR — it extracts text AND structure from documents, identifying form fields, tables, and key-value pairs. Purpose-built for processing documents like invoices, IDs, and contracts.",
+    "difficulty": "medium",
+    "trap": "Rekognition detects objects/faces in images, not document structure. Textract is the document intelligence service."
+  },
+  {
+    "id": "aws004",
+    "question": "What is Amazon SageMaker primarily used for?",
+    "options": ["A. Accessing pre-built foundation models", "B. Building, training, and deploying custom ML models", "C. Real-time speech recognition", "D. Enterprise semantic search"],
+    "answer": 1,
+    "explanation": "SageMaker is AWS's end-to-end ML platform — covering data preparation, model training, hyperparameter tuning, model registry, and deployment. It's for teams building their own models.",
+    "difficulty": "easy",
+    "trap": "Bedrock = consume FMs. SageMaker = build your own models. Know when to use each."
+  },
+  {
+    "id": "aws005",
+    "question": "Which Amazon Bedrock feature allows a model to query a company's internal knowledge base to answer questions?",
+    "options": ["A. Bedrock Fine-Tuning", "B. Bedrock Agents", "C. Bedrock Knowledge Bases", "D. Bedrock Guardrails"],
+    "answer": 2,
+    "explanation": "Amazon Bedrock Knowledge Bases implements RAG — it ingests your documents, creates vector embeddings, stores them in a vector store, and enables the FM to retrieve relevant context at query time.",
+    "difficulty": "medium",
+    "trap": "Fine-tuning changes model weights. Knowledge Bases adds external retrieval without changing the model."
+  },
+  {
+    "id": "aws006",
+    "question": "A company needs to detect fraudulent transactions in real time. Which AWS AI service is most appropriate?",
+    "options": ["A. Amazon Rekognition", "B. Amazon Fraud Detector", "C. Amazon Comprehend", "D. Amazon Forecast"],
+    "answer": 1,
+    "explanation": "Amazon Fraud Detector is purpose-built for detecting online fraud — it uses ML models trained on Amazon's fraud detection expertise to score transactions in real time.",
+    "difficulty": "medium",
+    "trap": "Forecast is for time-series predictions (demand, inventory). Fraud Detector is specifically for fraud use cases."
+  }
+]

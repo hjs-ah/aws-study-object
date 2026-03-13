@@ -1,0 +1,56 @@
+[
+  {
+    "id": "gen001",
+    "question": "What is a foundation model (FM)?",
+    "options": ["A. A model trained from scratch for each task", "B. A large pre-trained model adaptable to many tasks via fine-tuning or prompting", "C. AWS's proprietary model architecture", "D. A model specifically for image generation"],
+    "answer": 1,
+    "explanation": "Foundation models are large models pre-trained on broad data at scale, designed to be adapted (via fine-tuning, RAG, or prompting) to many downstream tasks without retraining from scratch.",
+    "difficulty": "easy",
+    "trap": "FMs are not task-specific — their value is in broad adaptability."
+  },
+  {
+    "id": "gen002",
+    "question": "What is Retrieval-Augmented Generation (RAG)?",
+    "options": ["A. A fine-tuning technique", "B. Augmenting LLM responses with real-time retrieved external knowledge", "C. A way to compress model size", "D. A prompt engineering pattern using few-shot examples"],
+    "answer": 1,
+    "explanation": "RAG retrieves relevant documents from an external knowledge base at inference time and provides them as context to the LLM, enabling up-to-date, factual responses without retraining.",
+    "difficulty": "medium",
+    "trap": "RAG is NOT fine-tuning — the model weights don't change. It's runtime context injection."
+  },
+  {
+    "id": "gen003",
+    "question": "What is 'hallucination' in the context of large language models?",
+    "options": ["A. Model generating slow responses", "B. Model confidently generating factually incorrect or fabricated information", "C. Model refusing to answer questions", "D. Model producing duplicate tokens"],
+    "answer": 1,
+    "explanation": "Hallucination occurs when an LLM generates plausible-sounding but factually incorrect or invented content. It's a key risk in production AI systems requiring mitigation strategies like RAG or human review.",
+    "difficulty": "easy",
+    "trap": "Hallucination isn't random noise — the model states falsehoods confidently, making it harder to detect."
+  },
+  {
+    "id": "gen004",
+    "question": "Which Amazon service provides access to multiple foundation models through a single API?",
+    "options": ["A. Amazon SageMaker", "B. Amazon Bedrock", "C. Amazon Comprehend", "D. AWS DeepRacer"],
+    "answer": 1,
+    "explanation": "Amazon Bedrock provides serverless access to FMs from Anthropic, Meta, Mistral, Stability AI, and Amazon (Titan, Nova) through a unified API — no infrastructure management required.",
+    "difficulty": "easy",
+    "trap": "SageMaker is for building/training custom models. Bedrock is for consuming pre-built FMs."
+  },
+  {
+    "id": "gen005",
+    "question": "What is prompt engineering?",
+    "options": ["A. Training a new model from scratch", "B. Designing and optimizing input text to guide LLM outputs", "C. Fine-tuning model weights", "D. Compressing model size for deployment"],
+    "answer": 1,
+    "explanation": "Prompt engineering is the practice of crafting, structuring, and iterating on input prompts to elicit desired behaviors or outputs from a language model without changing the model itself.",
+    "difficulty": "easy",
+    "trap": "Prompt engineering changes the input, not the model. Fine-tuning changes the model weights."
+  },
+  {
+    "id": "gen006",
+    "question": "A company needs to customize a foundation model on proprietary data without exposing that data to the FM provider. Which approach is best?",
+    "options": ["A. Few-shot prompting", "B. Amazon Bedrock Fine-tuning with data stored in S3", "C. Sending data directly in every API request", "D. Using Amazon Comprehend instead"],
+    "answer": 1,
+    "explanation": "Amazon Bedrock fine-tuning lets you adapt FMs using your private S3 data. The data is used only for training within your AWS account and is not shared with the FM provider.",
+    "difficulty": "hard",
+    "trap": "Option C (sending data in every request) exposes data at runtime and is expensive. Fine-tuning bakes knowledge into the model privately."
+  }
+]

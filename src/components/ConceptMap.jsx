@@ -18,3 +18,5 @@ export function ConceptMap({ domain }) {
     </div>
   )
 }
+
+export default ConceptMap

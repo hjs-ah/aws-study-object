@@ -1,0 +1,38 @@
+[
+  {
+    "id": "res001",
+    "question": "What does 'AI bias' refer to?",
+    "options": ["A. Model running slowly due to hardware", "B. Systematic and unfair discrimination in model outputs due to biased training data or design", "C. Model generating random errors", "D. Using AI for unethical business purposes"],
+    "answer": 1,
+    "explanation": "AI bias occurs when a model systematically produces unfair outcomes against certain groups — often due to biased training data, flawed feature selection, or unrepresentative samples.",
+    "difficulty": "easy",
+    "trap": "Bias isn't always intentional — it can emerge from historical data that reflects societal inequalities."
+  },
+  {
+    "id": "res002",
+    "question": "Which Amazon Bedrock feature helps prevent a model from generating harmful, offensive, or off-topic content?",
+    "options": ["A. Bedrock Knowledge Bases", "B. Bedrock Fine-Tuning", "C. Bedrock Guardrails", "D. Bedrock Agents"],
+    "answer": 2,
+    "explanation": "Amazon Bedrock Guardrails lets you define content filters, topic restrictions, and PII redaction policies that are applied to both inputs and outputs — enforcing responsible AI boundaries.",
+    "difficulty": "medium",
+    "trap": "Guardrails = safety filters at runtime. Fine-tuning = adjusting model behavior during training. Different layers of control."
+  },
+  {
+    "id": "res003",
+    "question": "What is 'explainability' in AI?",
+    "options": ["A. How fast a model generates responses", "B. The ability to understand and explain how an AI model reached a decision", "C. Model documentation quality", "D. Whether a model can explain its training data"],
+    "answer": 1,
+    "explanation": "Explainability (also called interpretability) refers to the degree to which humans can understand and audit how an AI system arrived at a specific output — critical for high-stakes decisions in healthcare, finance, and law.",
+    "difficulty": "easy",
+    "trap": "Black-box models (deep neural nets) can be accurate but lack explainability. This is a real-world tradeoff the exam tests."
+  },
+  {
+    "id": "res004",
+    "question": "A healthcare company must ensure their AI diagnostic model does not disadvantage any demographic group. Which responsible AI principle does this address?",
+    "options": ["A. Performance", "B. Fairness", "C. Availability", "D. Scalability"],
+    "answer": 1,
+    "explanation": "Fairness in AI means ensuring model outputs do not systematically disadvantage individuals based on protected characteristics like race, gender, or age. It's a core responsible AI pillar alongside transparency, privacy, and safety.",
+    "difficulty": "easy",
+    "trap": "Don't confuse fairness with accuracy — a model can be accurate on average but unfair to subgroups."
+  }
+]

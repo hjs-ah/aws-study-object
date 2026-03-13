@@ -1,154 +1,140 @@
 // src/pages/Domain.jsx
-import { useState } from 'react'
-import { useParams, Navigate } from 'react-router-dom'
-import { getDomain } from '../data/domains.js'
+// Domain study page — cert-aware, integrates score engine on practice questions.
+
+import { useParams } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { getCert } from '../data/certifications.js'
+import TabBar from '../components/TabBar.jsx'
+import ConceptMap from '../components/ConceptMap.jsx'
+import PracticeQuestion from '../components/PracticeQuestion.jsx'
+import ArchitectureTrap from '../components/ArchitectureTrap.jsx'
+import AskBar from '../components/AskBar.jsx'
+import DomainHeader from '../components/DomainHeader.jsx'
+import ScoreBadge from '../components/ScoreBadge.jsx'
+import { useScore } from '../hooks/useScore.js'
 import { useContent } from '../hooks/useContent.js'
-import { DomainHeader } from '../components/DomainHeader.jsx'
-import { TabBar } from '../components/TabBar.jsx'
-import { ConceptMap } from '../components/ConceptMap.jsx'
-import { PracticeQuestion } from '../components/PracticeQuestion.jsx'
-import { ArchitectureTrap } from '../components/ArchitectureTrap.jsx'
-import { ArchitectureBuilder } from '../components/ArchitectureBuilder.jsx'
-import { AskBar } from '../components/AskBar.jsx'
 
-export function Domain({ getDomainProgress, recordAnswer }) {
-  const { slug } = useParams()
-  const domain = getDomain(slug)
-  const [activeTab, setActiveTab] = useState('Concept map')
-  const [currentQ, setCurrentQ] = useState(0)
+// Lazy-load question JSON for both certs
+const questionLoaders = {
+  // SAA-C03
+  vpc: () => import('../data/questions/vpc.json', { assert: { type: 'json' } }),
+  iam: () => import('../data/questions/iam.json', { assert: { type: 'json' } }),
+  compute: () => import('../data/questions/compute.json', { assert: { type: 'json' } }),
+  storage: () => import('../data/questions/storage.json', { assert: { type: 'json' } }),
+  databases: () => import('../data/questions/databases.json', { assert: { type: 'json' } }),
+  ha: () => import('../data/questions/ha.json', { assert: { type: 'json' } }),
+  messaging: () => import('../data/questions/messaging.json', { assert: { type: 'json' } }),
+  cost: () => import('../data/questions/cost.json', { assert: { type: 'json' } }),
+  // AIP-C01
+  'ai-concepts': () => import('../data/questions/ai-concepts.json', { assert: { type: 'json' } }),
+  'gen-ai': () => import('../data/questions/gen-ai.json', { assert: { type: 'json' } }),
+  'aws-ai-services': () => import('../data/questions/aws-ai-services.json', { assert: { type: 'json' } }),
+  'responsible-ai': () => import('../data/questions/responsible-ai.json', { assert: { type: 'json' } }),
+  'ml-fundamentals': () => import('../data/questions/ml-fundamentals.json', { assert: { type: 'json' } }),
+  'security-compliance': () => import('../data/questions/security-compliance.json', { assert: { type: 'json' } }),
+}
 
-  const { questions, loading, source, notionConfigured } = useContent(
-    activeTab === 'Scenarios' ? slug : null
+export default function Domain() {
+  const { certSlug, domainSlug } = useParams()
+  const cert = getCert(certSlug)
+  const domain = cert?.domains.find(d => d.slug === domainSlug)
+
+  const [activeTab, setActiveTab] = useState('concepts')
+  const [questions, setQuestions] = useState([])
+
+  const { getDomainScore, getDomainCounts, recordAnswer } = useScore(certSlug)
+  const { items: notionItems, loading: notionLoading } = useContent(domainSlug, 'question', certSlug)
+
+  // Load seed questions
+  useEffect(() => {
+    const loader = questionLoaders[domainSlug]
+    if (loader) {
+      loader().then(m => setQuestions(m.default ?? []))
+    }
+  }, [domainSlug])
+
+  // Merge Notion questions on top of seed questions (Notion takes priority if available)
+  const allQuestions = notionItems.length > 0
+    ? notionItems.map(item => ({
+        id: item.id,
+        question: item.title,
+        options: item.options ? item.options.split('\n') : [],
+        answer: item.answer ?? 0,
+        explanation: item.explanation,
+        trap: item.trap,
+        difficulty: item.difficulty,
+      }))
+    : questions
+
+  if (!cert || !domain) return (
+    <div style={{ padding: '2rem', color: 'var(--text-muted)' }}>Domain not found.</div>
   )
 
-  if (!domain) return <Navigate to="/app" replace />
+  const score = getDomainScore(domainSlug)
+  const counts = getDomainCounts(domainSlug)
 
-  const progress = getDomainProgress(slug)
-
-  const handleTabChange = (tab) => {
-    setActiveTab(tab)
-    setCurrentQ(0)
-  }
-
-  const handleAnswer = (correct) => {
-    if (!questions?.[currentQ]) return
-    recordAnswer(slug, questions[currentQ].id, correct)
-  }
+  // AIP doesn't have Architecture Trap/Builder — filter tabs accordingly
+  const availableTabs = domain.tabs ?? ['concepts', 'scenarios']
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
-      <div style={{ flex: 1, overflowY: 'auto' }} className="domain-header-wrap">
-        <DomainHeader
-          domain={domain}
-          progress={progress}
-          source={source}
-          notionConfigured={notionConfigured}
-        />
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <DomainHeader domain={domain} certSlug={certSlug}>
+        <ScoreBadge score={score} />
+        {counts.total > 0 && (
+          <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+            {counts.correct}/{counts.total}
+          </span>
+        )}
+      </DomainHeader>
 
-        <TabBar tabs={domain.tabs} activeTab={activeTab} onTabChange={handleTabChange} />
+      <TabBar
+        tabs={availableTabs}
+        active={activeTab}
+        onChange={setActiveTab}
+        color={domain.color}
+      />
 
-        <div style={{ padding: '16px 20px' }}>
+      <div style={{ flex: 1, overflow: 'auto', padding: '1rem' }}>
+        {activeTab === 'concepts' && (
+          <ConceptMap domain={domain} certSlug={certSlug} />
+        )}
 
-          {activeTab === 'Concept map' && <ConceptMap domain={domain} />}
-
-          {activeTab === 'Architecture Trap' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div>
-              <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>🔍 Spot the Flaw</div>
-              <ArchitectureTrap domainSlug={slug} />
-            </div>
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 20 }}>
-              <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>🏗 Build It Right</div>
-              <ArchitectureBuilder domainSlug={slug} />
-            </div>
+        {activeTab === 'scenarios' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {allQuestions.length === 0 ? (
+              <div style={{ color: 'var(--text-muted)', padding: '1rem', textAlign: 'center' }}>
+                {notionLoading ? 'Loading questions…' : 'No questions found for this domain yet.'}
+              </div>
+            ) : (
+              allQuestions.map((q) => (
+                <PracticeQuestion
+                  key={q.id}
+                  question={q}
+                  onAnswer={(isCorrect) => recordAnswer(domainSlug, isCorrect)}
+                />
+              ))
+            )}
           </div>
         )}
 
-          {activeTab === 'Scenarios' && (
-            <div>
-              {loading && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 20, color: 'var(--color-text-muted)', fontSize: 13 }}>
-                  <div style={{ width: 14, height: 14, border: '2px solid var(--color-border-emphasis)', borderTopColor: 'var(--color-accent)', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
-                  Loading questions…
-                </div>
-              )}
-              {!loading && questions?.length === 0 && (
-                <div style={{ padding: 24, textAlign: 'center', background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: 13 }}>
-                  No questions found for {domain.title} yet.
-                  <br />
-                  <span style={{ fontSize: 11, marginTop: 6, display: 'block', fontFamily: 'var(--font-mono)' }}>
-                    Add rows to your Notion database with Domain = {slug} and Type = question
-                  </span>
-                </div>
-              )}
-              {!loading && questions?.length > 0 && (
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
-                    <span style={{ fontSize: 12, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)' }}>
-                      {currentQ + 1} / {questions.length}
-                      {source && <span style={{ marginLeft: 8, opacity: 0.6 }}>· {source === 'notion' ? 'from Notion' : 'seed data'}</span>}
-                    </span>
-                    <div style={{ display: 'flex', gap: 5 }}>
-                      {questions.map((q, i) => (
-                        <button key={i} onClick={() => setCurrentQ(i)} style={{
-                          width: 7, height: 7, borderRadius: '50%', border: 'none',
-                          background: i === currentQ ? 'var(--color-accent)' : progress.answeredQuestions?.[q.id] ? 'var(--color-success)' : 'var(--color-border-emphasis)',
-                          cursor: 'pointer', transition: 'background 200ms ease',
-                        }} />
-                      ))}
-                    </div>
-                  </div>
-                  <PracticeQuestion key={questions[currentQ].id} question={questions[currentQ]} onAnswer={handleAnswer} />
-                  <div style={{ marginTop: 12, textAlign: 'right' }}>
-                    <button
-                      onClick={() => setCurrentQ((n) => Math.min(n + 1, questions.length - 1))}
-                      disabled={currentQ >= questions.length - 1}
-                      style={{ padding: '8px 16px', background: 'transparent', border: '1px solid var(--color-border-emphasis)', borderRadius: 'var(--radius-sm)', color: 'var(--color-text-secondary)', fontSize: 13, cursor: 'pointer', opacity: currentQ >= questions.length - 1 ? 0.4 : 1 }}
-                    >Skip →</button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+        {activeTab === 'architecture-trap' && (
+          <ArchitectureTrap domain={domain} />
+        )}
 
-          {activeTab === 'Lab guide' && <LabGuide slug={slug} />}
-          {activeTab === 'Cheat sheet' && <CheatSheet slug={slug} />}
+        {activeTab === 'lab' && (
+          <div style={{ color: 'var(--text-muted)', padding: '1rem', fontSize: '0.875rem' }}>
+            Lab content for {domain.title} — add via Notion (Type = lab).
+          </div>
+        )}
 
-        </div>
+        {activeTab === 'cheat-sheet' && (
+          <div style={{ color: 'var(--text-muted)', padding: '1rem', fontSize: '0.875rem' }}>
+            Cheat sheet for {domain.title} — add via Notion (Type = cheat-sheet).
+          </div>
+        )}
       </div>
 
-      <AskBar domainSlug={slug} domainTitle={domain.title} />
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  )
-}
-
-function LabGuide({ slug }) {
-  const { questions: items, loading, source } = useContent(slug, 'lab')
-  return <NotionContentPane items={items} loading={loading} source={source} slug={slug} type="lab" emptyMsg="Lab guides coming soon — add rows with Type = lab in Notion." />
-}
-
-function CheatSheet({ slug }) {
-  const { questions: items, loading, source } = useContent(slug, 'cheat-sheet')
-  return <NotionContentPane items={items} loading={loading} source={source} slug={slug} type="cheat-sheet" emptyMsg="Cheat sheets coming soon — add rows with Type = cheat-sheet in Notion." />
-}
-
-function NotionContentPane({ items, loading, source, emptyMsg }) {
-  if (loading) return <div style={{ color: 'var(--color-text-muted)', fontSize: 13, padding: 20 }}>Loading…</div>
-  if (!items?.length) return (
-    <div style={{ padding: 24, textAlign: 'center', background: 'var(--color-surface)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)', fontSize: 13 }}>
-      {emptyMsg}
-    </div>
-  )
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {source && <div style={{ fontSize: 11, color: 'var(--color-text-muted)', fontFamily: 'var(--font-mono)', marginBottom: 4 }}>Source: {source}</div>}
-      {items.map((item) => (
-        <div key={item.id} style={{ background: 'var(--color-surface)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)', padding: '14px 16px' }}>
-          <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--color-text-primary)', marginBottom: 8 }}>{item.question}</div>
-          {item.body && <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{item.body}</p>}
-        </div>
-      ))}
+      <AskBar domainSlug={domainSlug} certSlug={certSlug} />
     </div>
   )
 }

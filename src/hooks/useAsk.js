@@ -5,7 +5,7 @@
 
 import { useState, useRef } from 'react'
 
-export function useAsk(domainSlug) {
+export function useAsk(domainSlug, certSlug) {
   const [answer, setAnswer] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -25,6 +25,7 @@ export function useAsk(domainSlug) {
         body: JSON.stringify({
           question,
           domainSlug,
+          certSlug,
           sessionCount: sessionCount.current,
         }),
       })

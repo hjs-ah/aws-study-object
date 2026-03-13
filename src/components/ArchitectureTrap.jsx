@@ -392,3 +392,5 @@ export function ArchitectureTrap({ domainSlug }) {
     </div>
   )
 }
+
+export default ArchitectureTrap

@@ -1,106 +1,67 @@
-// api/content.js — Vercel serverless function
-// Fetches questions and content from Notion filtered by domain slug.
-// Falls back gracefully: returns { source: 'notion', items: [] } with empty
-// items if Notion is not configured or returns no rows for this domain.
-// The frontend handles the empty case by falling back to seed JSON.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const NOTION_API = 'https://api.notion.com/v1'
-const NOTION_VERSION = '2022-06-28'
+// api/content.js — Notion content fetch
+// Queries the unified Notion DB filtered by certification + domain + type.
+// Falls back gracefully if Notion env vars are not set.
 
 export default async function handler(req, res) {
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' })
+  const { domainSlug, type, certSlug } = req.query
+
+  if (!domainSlug || !type) {
+    return res.status(400).json({ error: 'domainSlug and type are required' })
   }
 
-  const { domain, type = 'question' } = req.query
-
-  if (!domain) {
-    return res.status(400).json({ error: 'domain query param required' })
-  }
-
-  const apiKey = process.env.NOTION_API_KEY
-  const databaseId = process.env.NOTION_DATABASE_ID
-
-  // Graceful no-config fallback — frontend will use seed JSON
-  if (!apiKey || !databaseId) {
-    return res.status(200).json({ source: 'notion', items: [], configured: false })
+  if (!process.env.NOTION_API_KEY || !process.env.NOTION_DATABASE_ID) {
+    return res.status(200).json({ items: [], source: 'no-notion-config' })
   }
 
   try {
-    const response = await fetch(`${NOTION_API}/databases/${databaseId}/query`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Notion-Version': NOTION_VERSION,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        filter: {
-          and: [
-            { property: 'Domain', select: { equals: domain } },
-            { property: 'Type', select: { equals: type } },
-          ],
+    // Build filter: domain + type, optionally scoped to certification
+    const andFilters = [
+      { property: 'Domain', select: { equals: domainSlug } },
+      { property: 'Type',   select: { equals: type } },
+    ]
+    if (certSlug) {
+      andFilters.push({ property: 'Certification', select: { equals: certSlug } })
+    }
+
+    const response = await fetch(
+      `https://api.notion.com/v1/databases/${process.env.NOTION_DATABASE_ID}/query`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${process.env.NOTION_API_KEY}`,
+          'Notion-Version': '2022-06-28',
+          'Content-Type': 'application/json',
         },
-        sorts: [{ timestamp: 'created_time', direction: 'ascending' }],
-        page_size: 100,
-      }),
-    })
+        body: JSON.stringify({
+          filter: { and: andFilters },
+          sorts: [{ property: 'Difficulty', direction: 'ascending' }],
+        }),
+      }
+    )
 
     if (!response.ok) {
-      const err = await response.json()
-      console.error('Notion API error:', err)
-      // Return empty — frontend falls back to seed JSON
-      return res.status(200).json({ source: 'notion', items: [], configured: true, error: err.message })
+      console.error('Notion error:', response.status, await response.text())
+      return res.status(200).json({ items: [], source: 'notion-error' })
     }
 
     const data = await response.json()
-    const items = data.results.map(pageToItem)
+    const items = data.results.map((page) => ({
+      id: page.id,
+      title: page.properties.Title?.title?.[0]?.plain_text ?? '',
+      body: page.properties.Body?.rich_text?.[0]?.plain_text ?? '',
+      answer: page.properties.Answer?.number ?? null,
+      options: page.properties.Options?.rich_text?.[0]?.plain_text ?? '',
+      explanation: page.properties.Explanation?.rich_text?.[0]?.plain_text ?? '',
+      trap: page.properties.Trap?.rich_text?.[0]?.plain_text ?? '',
+      difficulty: page.properties.Difficulty?.select?.name ?? 'medium',
+      domain: page.properties.Domain?.select?.name ?? domainSlug,
+      certification: page.properties.Certification?.select?.name ?? certSlug,
+      type: page.properties.Type?.select?.name ?? type,
+    }))
 
-    return res.status(200).json({
-      source: 'notion',
-      configured: true,
-      items,
-      hasMore: data.has_more,
-    })
+    return res.status(200).json({ items, source: 'notion' })
   } catch (err) {
-    console.error('content.js fetch error:', err)
-    return res.status(200).json({ source: 'notion', items: [], configured: true, error: err.message })
-  }
-}
-
-// ── Transform a Notion page row into a flat question/content object ──────────
-function pageToItem(page) {
-  const p = page.properties
-
-  const getText = (prop) => {
-    if (!prop) return ''
-    if (prop.type === 'title') return prop.title?.map((t) => t.plain_text).join('') ?? ''
-    if (prop.type === 'rich_text') return prop.rich_text?.map((t) => t.plain_text).join('') ?? ''
-    return ''
-  }
-
-  const getSelect = (prop) => prop?.select?.name ?? null
-  const getNumber = (prop) => prop?.number ?? null
-
-  const optionsRaw = getText(p.Options)
-  const options = optionsRaw
-    ? optionsRaw.split('|').map((o) => o.trim()).filter(Boolean)
-    : []
-
-  return {
-    id: page.id,
-    // Question text lives in the Title column
-    question: getText(p.Title),
-    domain: getSelect(p.Domain),
-    type: getSelect(p.Type),
-    difficulty: getSelect(p.Difficulty),
-    options,
-    correct: getNumber(p.Answer),  // 0-indexed
-    explanation: getText(p.Explanation),
-    trap: getText(p.Trap),
-    body: getText(p.Body),
-    notionUrl: page.url,
-    createdAt: page.created_time,
+    console.error('Notion fetch error:', err)
+    return res.status(200).json({ items: [], source: 'error' })
   }
 }
