@@ -1,0 +1,80 @@
+[
+  {
+    "id": "vpc-001",
+    "question": "A company needs instances in a private subnet to download software updates from the internet, but must prevent inbound connections from the internet. What should the solutions architect implement?",
+    "options": [
+      "Place an Internet Gateway in the private subnet",
+      "Place a NAT Gateway in the public subnet and update the private subnet route table",
+      "Place a NAT Gateway in the private subnet and update the public subnet route table",
+      "Place a VPN Gateway in the private subnet"
+    ],
+    "correct": 1,
+    "explanation": "A NAT Gateway must be placed in a PUBLIC subnet — it needs its own route to the Internet Gateway to function. The private subnet's route table then points 0.0.0.0/0 to the NAT Gateway. This allows outbound internet traffic from private instances while blocking all inbound connections. Option C is the most common wrong answer on this exam — placing NAT Gateway in the private subnet breaks the architecture entirely.",
+    "trap": "NAT Gateway must be in the PUBLIC subnet, not private."
+  },
+  {
+    "id": "vpc-002",
+    "question": "A solutions architect is designing a multi-tier web application. The web tier, application tier, and database tier must all be isolated from each other. Which combination provides the MOST secure network segmentation?",
+    "options": [
+      "One public subnet for all tiers with Security Groups controlling access",
+      "Public subnet for web tier, private subnet for app tier, private subnet for database tier, with Security Groups and NACLs",
+      "Public subnet for web tier and app tier, isolated subnet for database tier",
+      "Three public subnets in different AZs with NACLs blocking cross-tier traffic"
+    ],
+    "correct": 1,
+    "explanation": "The three-tier model places only the load balancer/web tier in a public subnet, application servers in a private subnet (can reach internet via NAT Gateway), and databases in an isolated subnet with no route to the internet at all. Security Groups handle instance-level filtering (stateful); NACLs add subnet-level filtering (stateless). Defense-in-depth means using both layers, not either/or.",
+    "trap": "An 'isolated' subnet has no route to the internet — not even through NAT Gateway. This is different from 'private.'"
+  },
+  {
+    "id": "vpc-003",
+    "question": "A company has two VPCs (VPC-A and VPC-B) connected via VPC Peering. They add a third VPC (VPC-C) and peer it with VPC-B. Instances in VPC-A need to communicate with instances in VPC-C. What is required?",
+    "options": [
+      "Nothing — VPC Peering is transitive by default",
+      "Add a route in VPC-A's route table pointing to VPC-C via the VPC-B peering connection",
+      "Create a direct VPC Peering connection between VPC-A and VPC-C",
+      "Deploy a Transit Gateway and connect all three VPCs"
+    ],
+    "correct": 2,
+    "explanation": "VPC Peering is NON-TRANSITIVE. A peering connection between A↔B and B↔C does not allow A to reach C through B — traffic cannot flow through an intermediate VPC. The only way for A to communicate with C is a direct peering connection between A and C, or using Transit Gateway which IS transitive and designed for hub-and-spoke architectures at scale.",
+    "trap": "VPC Peering is explicitly non-transitive — this is one of the most tested VPC concepts on the exam."
+  },
+  {
+    "id": "vpc-004",
+    "question": "A security team needs to block a specific IP address range from accessing their application. They need the rule to apply immediately and persistently. Which service should they use?",
+    "options": [
+      "Security Group — add a deny rule for the IP range",
+      "Network ACL — add a deny rule for the IP range",
+      "Route Table — remove the route for the IP range",
+      "Internet Gateway — configure IP filtering"
+    ],
+    "correct": 1,
+    "explanation": "Security Groups do NOT support deny rules — they are allow-only and stateful (return traffic is automatically allowed). Network ACLs DO support explicit deny rules and are stateless (you need both inbound and outbound rules). NACLs are the correct tool for blocking specific IP ranges at the subnet level. Rules are processed in order by rule number, so place the deny before the allow.",
+    "trap": "Security Groups cannot DENY — they can only ALLOW. NACLs support both allow and deny rules."
+  },
+  {
+    "id": "vpc-005",
+    "question": "An application running on EC2 needs to connect to an S3 bucket without traffic leaving the AWS network. The EC2 instances are in a private subnet with no NAT Gateway. What should the architect configure?",
+    "options": [
+      "Add a NAT Gateway to route S3 traffic through the internet",
+      "Create a VPC Endpoint (Gateway type) for S3 and update the route table",
+      "Create a VPC Peering connection to the S3 VPC",
+      "Assign Elastic IPs to the EC2 instances"
+    ],
+    "correct": 1,
+    "explanation": "A VPC Gateway Endpoint for S3 (and DynamoDB) allows private subnet instances to reach S3 without internet access, NAT Gateway, or leaving the AWS network. It's added as a route in the route table — free to use, no data processing charge. This is the preferred architecture for private subnets accessing S3. Interface Endpoints (PrivateLink) are used for other AWS services and have an hourly cost.",
+    "trap": "Gateway Endpoints (S3, DynamoDB) are free. Interface Endpoints (PrivateLink for other services) have hourly charges."
+  },
+  {
+    "id": "vpc-006",
+    "question": "A company needs to connect their on-premises data center to AWS with a consistent, low-latency, high-bandwidth connection. The connection must not traverse the public internet. Which solution meets these requirements?",
+    "options": [
+      "Site-to-Site VPN over the public internet",
+      "AWS Direct Connect",
+      "VPC Peering with the on-premises network",
+      "AWS Transit Gateway with internet routing"
+    ],
+    "correct": 1,
+    "explanation": "AWS Direct Connect provides a dedicated physical network connection from on-premises to AWS, bypassing the public internet entirely. It offers consistent latency, higher bandwidth (1Gbps to 100Gbps), and is required for workloads needing predictable network performance. Site-to-Site VPN is encrypted but DOES traverse the internet — latency varies. VPC Peering only works between VPCs, not on-premises networks.",
+    "trap": "Site-to-Site VPN is encrypted but still goes over the public internet — it cannot guarantee consistent latency."
+  }
+]
