@@ -141,3 +141,15 @@ input, textarea { font-family: inherit; }
 .pulse-hint {
   animation: interactPulse 2s ease-out 1s 2;
 }
+
+/* ── Aliases for v2 components (map shorthand vars to design tokens) ─────── */
+:root {
+  --bg-primary:    var(--color-bg);
+  --bg-secondary:  var(--color-surface);
+  --bg-tertiary:   var(--color-surface-raised);
+  --text-primary:  var(--color-text-primary);
+  --text-secondary:var(--color-text-secondary);
+  --text-muted:    var(--color-text-muted);
+  --border:        var(--color-border);
+  --accent:        var(--color-accent);
+}
