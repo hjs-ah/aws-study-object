@@ -5,7 +5,6 @@ import { Landing } from './pages/Landing.jsx'
 import { Home } from './pages/Home.jsx'
 import { Domain } from './pages/Domain.jsx'
 import { HowToUse } from './pages/HowToUse.jsx'
-import { ReleaseNotes } from './pages/ReleaseNotes.jsx'
 import { useProgress } from './hooks/useProgress.js'
 import { useTheme } from './hooks/useTheme.js'
 import './styles/tokens.css'
@@ -18,7 +17,6 @@ function AppShell({ getDomainProgress, recordAnswer, getOverallStats, theme, tog
         <Routes>
           <Route path="/" element={<Home getProgress={getDomainProgress} getOverallStats={getOverallStats} />} />
           <Route path="/how-to-use" element={<HowToUse />} />
-          <Route path="/release-notes" element={<ReleaseNotes />} />
           <Route path="/domain/:slug" element={<Domain getDomainProgress={getDomainProgress} recordAnswer={recordAnswer} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -30,6 +28,7 @@ function AppShell({ getDomainProgress, recordAnswer, getOverallStats, theme, tog
 export default function App() {
   const { getDomainProgress, recordAnswer, getOverallStats } = useProgress()
   const { theme, toggleTheme } = useTheme()
+
   return (
     <BrowserRouter>
       <Routes>

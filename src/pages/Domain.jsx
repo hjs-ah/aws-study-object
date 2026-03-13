@@ -8,7 +8,6 @@ import { TabBar } from '../components/TabBar.jsx'
 import { ConceptMap } from '../components/ConceptMap.jsx'
 import { PracticeQuestion } from '../components/PracticeQuestion.jsx'
 import { ArchitectureTrap } from '../components/ArchitectureTrap.jsx'
-import { ArchitectureBuilder } from '../components/ArchitectureBuilder.jsx'
 import { AskBar } from '../components/AskBar.jsx'
 
 export function Domain({ getDomainProgress, recordAnswer }) {
@@ -51,18 +50,7 @@ export function Domain({ getDomainProgress, recordAnswer }) {
 
           {activeTab === 'Concept map' && <ConceptMap domain={domain} />}
 
-          {activeTab === 'Architecture Trap' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-            <div>
-              <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>🔍 Spot the Flaw</div>
-              <ArchitectureTrap domainSlug={slug} />
-            </div>
-            <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: 20 }}>
-              <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--color-text-muted)', letterSpacing: '0.07em', textTransform: 'uppercase', marginBottom: 10 }}>🏗 Build It Right</div>
-              <ArchitectureBuilder domainSlug={slug} />
-            </div>
-          </div>
-        )}
+          {activeTab === 'Architecture Trap' && <ArchitectureTrap domainSlug={slug} />}
 
           {activeTab === 'Scenarios' && (
             <div>
