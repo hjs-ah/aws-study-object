@@ -93,23 +93,27 @@ export default function Landing() {
       position: 'relative',
       overflow: 'hidden',
     }}>
-      {/* Cloud background image — centered at bottom */}
+      {/* Cloud background image — centered at bottom, behind all content */}
       <img
         src="/cloud.png"
         alt=""
         aria-hidden="true"
         style={{
           position: 'absolute',
-          bottom: '-40px',
+          bottom: '-20px',
           left: '50%',
           transform: 'translateX(-50%)',
-          width: 'clamp(480px, 75vw, 900px)',
+          width: 'clamp(220px, 34vw, 410px)',
           opacity: 0.06,
           pointerEvents: 'none',
           userSelect: 'none',
           filter: 'grayscale(1)',
+          zIndex: 0,
         }}
       />
+      {/* All page content above the cloud image */}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
       {/* Theme toggle top-right */}
       <button
         onClick={toggleTheme}
@@ -269,6 +273,8 @@ export default function Landing() {
       <p style={{ marginTop: '2rem', fontSize: '0.68rem', color: 'var(--color-text-muted)' }}>
         More certifications coming soon · Built with Amazon Bedrock &amp; Notion
       </p>
+
+      </div>{/* end content layer */}
     </div>
   )
 }

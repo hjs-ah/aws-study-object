@@ -16,6 +16,7 @@ export default function ScoreDashboard({ certSlug }) {
     getOverallScore,
     isExamReady,
     resetCert,
+    resetDomain,
     EXAM_READY_THRESHOLD,
   } = useScore(certSlug)
 
@@ -113,21 +114,47 @@ export default function ScoreDashboard({ certSlug }) {
           return (
             <div
               key={domain.slug}
-              onClick={() => navigate(`/app/${certSlug}/domain/${domain.slug}`)}
               style={{ background: 'var(--color-surface)', borderRadius: '8px', padding: '0.85rem 1rem',
-                cursor: 'pointer', transition: 'background 0.15s' }}
-              onMouseEnter={e => e.currentTarget.style.background = 'var(--color-surface-raised)'}
-              onMouseLeave={e => e.currentTarget.style.background = 'var(--color-surface)'}
+                transition: 'background 0.15s', position: 'relative' }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-primary)' }}>{domain.title}</span>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                {/* Clickable domain name */}
+                <span
+                  onClick={() => navigate(`/app/${certSlug}/domain/${domain.slug}`)}
+                  style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text-primary)', cursor: 'pointer' }}
+                  onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+                  onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+                >
+                  {domain.title}
+                </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                   <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
                     {counts.correct}/{counts.total}
                   </span>
                   <span style={{ fontSize: '0.8rem', fontWeight: 700, color: barColor }}>
                     {score === null ? '—' : `${score}%`}
                   </span>
+                  {counts.total > 0 && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (confirm(`Reset scores for ${domain.title}?`)) resetDomain(domain.slug)
+                      }}
+                      title="Reset this domain's scores"
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        fontSize: '0.68rem', color: 'var(--color-text-muted)',
+                        padding: '2px 6px', borderRadius: '4px',
+                        border: '1px solid var(--color-border)',
+                        fontFamily: 'inherit', lineHeight: 1,
+                        transition: 'all 0.15s',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444' }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-muted)' }}
+                    >
+                      ↺ reset
+                    </button>
+                  )}
                 </div>
               </div>
               {/* Progress bar */}

@@ -38,7 +38,7 @@ export default function Domain() {
   const [activeTab, setActiveTab] = useState('concepts')
   const [questions, setQuestions] = useState([])
 
-  const { getDomainScore, getDomainCounts, recordAnswer } = useScore(certSlug)
+  const { getDomainScore, getDomainCounts, recordAnswer, resetDomain } = useScore(certSlug)
   const { items: notionItems, loading: notionLoading } = useContent(domainSlug, 'question', certSlug)
 
   useEffect(() => {
@@ -69,11 +69,27 @@ export default function Domain() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <DomainHeader domain={domain} certSlug={certSlug}>
-        <ScoreBadge score={score} />
         {counts.total > 0 && (
           <span style={{ fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
             {counts.correct}/{counts.total}
           </span>
+        )}
+        <ScoreBadge score={score} />
+        {counts.total > 0 && (
+          <button
+            onClick={() => { if (confirm(`Reset scores for ${domain.title}?`)) resetDomain(domainSlug) }}
+            title="Reset this domain's scores"
+            style={{
+              background: 'none', border: '1px solid var(--color-border)',
+              borderRadius: '4px', padding: '2px 7px', cursor: 'pointer',
+              fontSize: '0.65rem', color: 'var(--color-text-muted)',
+              fontFamily: 'inherit', lineHeight: 1, transition: 'all 0.15s',
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.color = '#ef4444' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--color-border)'; e.currentTarget.style.color = 'var(--color-text-muted)' }}
+          >
+            ↺
+          </button>
         )}
       </DomainHeader>
 
