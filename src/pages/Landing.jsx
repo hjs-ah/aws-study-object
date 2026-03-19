@@ -91,7 +91,25 @@ export default function Landing() {
       alignItems: 'center',
       padding: '3.5rem 1rem 3rem',
       position: 'relative',
+      overflow: 'hidden',
     }}>
+      {/* Cloud background image — centered at bottom */}
+      <img
+        src="/cloud.png"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: '-40px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: 'clamp(480px, 75vw, 900px)',
+          opacity: 0.06,
+          pointerEvents: 'none',
+          userSelect: 'none',
+          filter: 'grayscale(1)',
+        }}
+      />
       {/* Theme toggle top-right */}
       <button
         onClick={toggleTheme}

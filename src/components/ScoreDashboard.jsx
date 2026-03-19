@@ -27,7 +27,24 @@ export default function ScoreDashboard({ certSlug }) {
   const totalAttempts = cert.domains.reduce((sum, d) => sum + getDomainCounts(d.slug).total, 0)
 
   return (
-    <div style={{ padding: '1.5rem', maxWidth: '720px', margin: '0 auto' }}>
+    <div style={{ padding: '1.5rem', maxWidth: '720px', margin: '0 auto', position: 'relative' }}>
+      {/* Cloud watermark — upper right */}
+      <img
+        src="/cloud.png"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '-20px',
+          right: '-40px',
+          width: '260px',
+          opacity: 0.05,
+          pointerEvents: 'none',
+          userSelect: 'none',
+          filter: 'grayscale(1)',
+          zIndex: 0,
+        }}
+      />
 
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>

@@ -21,7 +21,24 @@ export default function Home() {
   const examReady = isExamReady(cert.domains)
 
   return (
-    <div style={{ padding: '1.75rem', maxWidth: '820px', margin: '0 auto' }}>
+    <div style={{ padding: '1.75rem', maxWidth: '820px', margin: '0 auto', position: 'relative' }}>
+      {/* Cloud watermark — upper right */}
+      <img
+        src="/cloud.png"
+        alt=""
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          top: '-20px',
+          right: '-40px',
+          width: '260px',
+          opacity: 0.05,
+          pointerEvents: 'none',
+          userSelect: 'none',
+          filter: 'grayscale(1)',
+          zIndex: 0,
+        }}
+      />
       {/* Cert header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.875rem', marginBottom: '1.75rem' }}>
         <span style={{ fontSize: '2rem' }}>{cert.icon}</span>
