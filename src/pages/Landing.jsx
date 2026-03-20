@@ -28,7 +28,7 @@ function ReleaseNotesSection() {
   useEffect(() => {
     fetch('/api/releases')
       .then(r => r.json())
-      .then(data => { if (data.releases?.length > 0) setReleases(data.releases) })
+      .then(data => { if (data.items?.length > 0) setReleases(data.items) })
       .catch(() => {})
   }, [])
 

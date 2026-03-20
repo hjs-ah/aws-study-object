@@ -142,7 +142,7 @@ export default function ScoreDashboard({ certSlug }) {
                       }}
                       title="Reset this domain's scores"
                       style={{
-                        background: 'none', border: 'none', cursor: 'pointer',
+                        background: 'none', cursor: 'pointer',
                         fontSize: '0.68rem', color: 'var(--color-text-muted)',
                         padding: '2px 6px', borderRadius: '4px',
                         border: '1px solid var(--color-border)',
